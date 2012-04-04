@@ -1,5 +1,27 @@
 import urllib
+import hashlib
+import hmac
 
 def percent_encode(string):
     return urllib.quote(string.encode('utf-8'), '~')
 
+
+def to_query(obj, ns=None):
+    if isinstance(obj, dict):
+        pairs = sum((to_query(v, u"{0}[{1}]".format(ns, k) if ns else k)
+                     for k, v in obj.items()), [])
+        if ns:
+            return pairs
+        return u"&".join(u"{0}={1}".format(*p) for p in sorted(pairs))
+    elif isinstance(obj, (list, tuple)):
+        return sum((to_query(v, u"{0}[]".format(ns)) for v in obj), [])
+    else:
+        return [(percent_encode(unicode(ns)), percent_encode(unicode(obj)))]
+
+def generate_signature(data, secret):
+    """
+    signature takes a dict / tuple /string
+    and your application's secret, returning a HMAC-SHA256
+    digest of the data.
+    """
+    return hmac.new(secret, to_query(data), hashlib.sha256).hexdigest()
