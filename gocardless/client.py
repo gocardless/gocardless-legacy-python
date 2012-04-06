@@ -59,8 +59,33 @@ class Client(object):
             # Default to using bearer auth with the access token
             request.use_bearer_auth(self._access_token)
 
-        request.set_payload(kwargs.get('data'))
-
+        request.set_payload(kwargs.get('data'))        
         return request.perform()
+        
+    def merchant(self):
+        """Returns the current Merchant's details.
+        
+        """
+        return self.api_get('/merchants/%s' % self._merchant_id)
+    
+    def users(self):
+        """Index a merchant's customers 
+        """
+        return self.api_get('/merchants/%s/users' % self._merchant_id)
+    
+    
+    def subscriptions(self):
+        """Returns all subscriptions for a merchant."""
+        return self.api_get('/merchants/%s/subscriptions/' % self._merchant_id)
+
+
+    def get_subscription(self, id):
+        """Returns a single subscription
+        """
+        return self.api_get('/subscriptions/%s' % (id))
+    
+    def cancel_subscription(self, id):
+        """Cancels a subscription given an id"""
+        
 
 

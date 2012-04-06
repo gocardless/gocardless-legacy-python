@@ -7,17 +7,6 @@ from gocardless import utils
 
 
 class PercentEncodeTestCase(unittest.TestCase):
-    def setUp(self):
-        self.secret = '5PUZmVMmukNwiHc7V/TJvFHRQZWZumIpCnfZKrVYGpuAdkCcEfv3LIDSrsJ+xOVH'
-        self.api_key = ''
-        self.client_id = '4jqkF9tirkr3zfWCgEKxLDy3UmF1sWpHPVm8X69yiB7Lqb63usVOPzrm0jEepc5R'
-
-    def test_hmac(self):
-        # make sure our signature function 
-        # works correctly
-        sig = utils.signature({"foo": "bar", "example": [1, "a"]},self.secret)
-        self.assertEqual(sig, '5a9447aef2ebd0e12d80d80c836858c6f9c13219f615ef5d135da408bcad453d')
-    
 
     def test_works_with_empty_strings(self):
       self.assertEqual(utils.percent_encode(u""), u"")
@@ -50,3 +39,15 @@ class PercentEncodeTestCase(unittest.TestCase):
                        u"%E6%94%AF%E6%89%95%E3%81%84")
 
 
+class SignatureTestCase(unittest.TestCase):
+    def setUp(self):
+      self.secret = '5PUZmVMmukNwiHc7V/TJvFHRQZWZumIpCnfZKrVYGpuAdkCcEfv3LIDSrsJ+xOVH'
+      self.api_key = ''
+      self.client_id = '4jqkF9tirkr3zfWCgEKxLDy3UmF1sWpHPVm8X69yiB7Lqb63usVOPzrm0jEepc5R'
+
+    def test_hmac(self):
+      # make sure our signature function 
+      # works correctly
+      sig = utils.signature({"foo": "bar", "example": [1, "a"]},self.secret)
+      self.assertEqual(sig, '5a9447aef2ebd0e12d80d80c836858c6f9c13219f615ef5d135da408bcad453d')
+    
