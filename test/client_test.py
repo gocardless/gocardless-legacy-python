@@ -41,11 +41,10 @@ class ClientTestCase(unittest.TestCase):
         """Test that the correct number of values are returned.
         """
         dan_test = {
-            'app_id': 'XXXX',
-            'app_secret': 'XXXXX',
-            'token': 'XXXXXXX',
-            'merchant_id': 'XXXXXXX',
-        
+        'app_id': 'HR2cVOEU62zgRuuyxvP2F0U7zCludbXEeJM_ianBqdrbXpo1yPHFqz5_6m_H9J7b',
+        'app_secret': 'w3CQ9aG1p_IMywmcNhIl_mL0NceV56vvta5rIEhutNBnplr5_3aydYgRDPjfZVNw',
+        'token': 'MKyA7QJPEPbXAVY3xyroiuAVGPz6JuF/taGU2udJ8N77X/GouuJAQg87ordFHX9E',
+        'merchant_id': '018X64WCTJ',
         }
         Client.base_url = 'https://sandbox.gocardless.com'
         gocardless.environment = 'sandbox'

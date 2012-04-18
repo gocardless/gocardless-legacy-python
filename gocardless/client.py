@@ -43,6 +43,23 @@ class Client(object):
         """
         return self._request('get', Client.API_PATH + path, **kwargs)
 
+    def api_delete(self, path, **kwargs):
+        """Issue a delete to the API server.
+
+        :param path: the path that will be added to the API prefix
+        :param params: query string parameters
+        """
+        return self._request('delete', Client.API_PATH + path, **kwargs)
+
+     def api_put(self, path, **kwargs):
+        """Issue a PUT to the API server.
+
+        :param path: the path that will be added to the API prefix
+        :param params: query string parameters
+        """
+        return self._request('put', Client.API_PATH + path, **kwargs)
+
+
     def _request(self, method, path, **kwargs):
         """Send a request to the GoCardless API servers.
 
@@ -68,24 +85,63 @@ class Client(object):
         """
         return self.api_get('/merchants/%s' % self._merchant_id)
     
-    def users(self):
+    def users(self, **kwargs):
         """Index a merchant's customers 
         """
-        return self.api_get('/merchants/%s/users' % self._merchant_id)
+        return self.api_get('/merchants/%s/users' % self._merchant_id, **kwargs)
     
     
-    def subscriptions(self):
+    def subscriptions(self, **kwargs):
         """Returns all subscriptions for a merchant."""
-        return self.api_get('/merchants/%s/subscriptions/' % self._merchant_id)
+        return self.api_get('/merchants/%s/subscriptions/' % self._merchant_id, **kwargs)
 
 
     def get_subscription(self, id):
-        """Returns a single subscription
+        """Returns a single subscription.
+
+        :params : id - Subscription ID
         """
         return self.api_get('/subscriptions/%s' % (id))
     
     def cancel_subscription(self, id):
-        """Cancels a subscription given an id"""
-        
+        """Cancels a subscription given an id.
 
+        :params id:  Subscription ID
+
+        """
+        return self.api_put('/subscriptions/%s/cancel/' % (id))
+
+    def get_pre_auth(self, id):
+        """Show one pre-authorisation.
+        :params id: pre-auth id
+
+        """
+        return self.api_get('/pre_authorizations/%s' % (id))
+        
+    def pre_auths(self, **kwargs):
+        """Returns a list of a merchants pre-authorised transactions.
+        """
+        return self.api_get('/merchants/%s/pre_authorizations'% (self._merchant_id), **kwargs)
+
+    def get_bill(self, id):
+        """Returns a single Bill object.
+
+        :params id: Bill id
+        """
+        return self.api_get('/bills/%' % (id))
+
+    def bills(self, **kwargs):
+        """Returns all Bills for a merchant.
+        """
+        return self.api_get('/merchant/%s/bills' % (self._merchant_id), **kwargs)
+
+    def create_bill(self, amount, pre_auth_id):
+        """Create a new bill against an existing pre_authorization, if and only if
+        the pre_auth has not expired.
+        
+        :params amount: Amount to be billed in float to two significant figures.
+        :params pre_auth_id: A valid pre authorisation id.
+        """
+        payload = {"bill": {"amount": amount, "pre_authorization_id": pre_auth_id}}
+        return self._request('post', '/bills', data=json.dumps(payload))
 
