@@ -1,10 +1,10 @@
 import urllib
 import hashlib
 import hmac
+import re
 
 def percent_encode(string):
     return urllib.quote(string.encode('utf-8'), '~')
-
 
 def to_query(obj, ns=None):
     if isinstance(obj, dict):
@@ -25,3 +25,12 @@ def generate_signature(data, secret):
     digest of the data.
     """
     return hmac.new(secret, to_query(data), hashlib.sha256).hexdigest()
+
+def camelize(to_uncamel):
+    result = []
+    for word in re.split("_", to_uncamel):
+        result.append(word[0].upper() + word[1:])
+    return "".join(result)
+
+def singularize(to_sing):
+    return re.sub("s$", "", to_sing)
