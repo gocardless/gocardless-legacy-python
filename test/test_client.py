@@ -8,10 +8,11 @@ import sys
 import urlparse
 
 import gocardless
+import gocardless.client
 from gocardless.client import Client
 from gocardless import utils
 from gocardless import urlbuilder
-from gocardless.exceptions import SignatureError
+from gocardless.exceptions import SignatureError, ClientError
 from test_resources import create_mock_attrs
 
 merchant_json = json.loads("""{
@@ -65,23 +66,42 @@ mock_account_details = {
             'merchant_id': merchant_json["id"],
         }
 
+def get_url_params(url):
+    param_dict = urlparse.parse_qs(urlparse.urlparse(url).query)
+    return dict([[k,v[0]] for k,v in param_dict.items()])
+
+    
+
 class ClientTestCase(unittest.TestCase):
 
     def setUp(self):
         self.account_details = mock_account_details.copy()
         self.client = Client(**self.account_details)
 
+    def test_error_raises_clienterror(self):
+        with patch('gocardless.client.Request') as mock_request_module:
+            mock_request = mock.Mock()
+            mock_request.perform.return_value = {"error":"anerrormessage"}
+            mock_request_module.return_value = mock_request
+            with self.assertRaises(ClientError) as ex:
+                self.client.api_get("/somepath")
+            self.assertEqual(ex.exception.message, "Error calling api, message"
+                " was anerrormessage")
+
     def test_base_url_returns_the_correct_url_for_production(self):
-      gocardless.environment = 'production'
-      self.assertEqual(Client.get_base_url(), 'https://gocardless.com')
+        gocardless.environment = 'production'
+        self.assertEqual(Client.get_base_url(), 'https://gocardless.com')
 
     def test_base_url_returns_the_correct_url_for_sandbox(self):
-      gocardless.environment = 'sandbox'
-      self.assertEqual(Client.get_base_url(), 'https://sandbox.gocardless.com')
+        gocardless.environment = 'sandbox'
+        self.assertEqual(Client.get_base_url(), 'https://sandbox.gocardless.com')
+        gocardless.environment = "production"
 
     def test_base_url_returns_the_correct_url_when_set_manually(self):
-      Client.base_url = 'https://abc.gocardless.com'
-      self.assertEqual(Client.get_base_url(), 'https://abc.gocardless.com')
+        old_url = Client.base_url
+        Client.base_url = 'https://abc.gocardless.com'
+        self.assertEqual(Client.get_base_url(), 'https://abc.gocardless.com')
+        Client.base_url = old_url
 
     def test_app_id_required(self):
         self.account_details.pop('app_id')
@@ -118,6 +138,10 @@ class ClientTestCase(unittest.TestCase):
             obj = getattr(self.client, resource_name)("1")
             self.assertEqual(resource_fixture["id"], obj.id)
             self.assertIsInstance(obj, expected_klass)
+
+    def test_set_details_creates_client(self):
+        gocardless.set_details(mock_account_details)
+        self.assertIsNotNone(gocardless.global_client)
 
 class ConfirmResourceTestCase(unittest.TestCase):
 
@@ -181,7 +205,7 @@ class UrlBuilderTestCase(unittest.TestCase):
                 "amount":20.0,
                     "merchant_id":"merchid"})
         url = self.urlbuilder.build_and_sign(params)
-        urlparams = self.get_url_params(url)
+        urlparams = get_url_params(url)
         for k,v in params.to_dict().items():
             if k == "resource_name":
                 continue
@@ -191,7 +215,7 @@ class UrlBuilderTestCase(unittest.TestCase):
         params = self.make_mock_params({"resource_name":"bills", \
                 "amount":20.0})
         url = self.urlbuilder.build_and_sign(params)
-        urlparams = self.get_url_params(url)
+        urlparams = get_url_params(url)
         self.assertTrue(urlparams.has_key("bill[amount]"))
         
 
@@ -199,45 +223,45 @@ class UrlBuilderTestCase(unittest.TestCase):
         params = self.make_mock_params({"resource_name": "bill",
             "merchant_id":self.merchant_id})
         url = self.urlbuilder.build_and_sign(params)
-        urlparams = self.get_url_params(url)
+        urlparams = get_url_params(url)
         self.assertEqual(urlparams["bill[merchant_id]"], self.merchant_id)
 
     def test_url_contains_state(self):
         params = self.make_mock_params({})
         url = self.urlbuilder.build_and_sign(params, state="somestate")
-        urlparams = self.get_url_params(url)
+        urlparams = get_url_params(url)
         self.assertEqual(urlparams["state"], "somestate")
 
     def test_url_contains_redirect(self):
         params = self.make_mock_params({})
         url = self.urlbuilder.build_and_sign(params, redirect_uri="http://somesuchplace.com")
-        urlparams = self.get_url_params(url)
+        urlparams = get_url_params(url)
         self.assertEqual(urlparams["redirect_uri"], "http://somesuchplace.com")
 
     def test_url_contains_cancel(self):
         params = self.make_mock_params({})
         url = self.urlbuilder.build_and_sign(params, 
                 cancel_uri="http://cancel")
-        urlparams = self.get_url_params(url)
+        urlparams = get_url_params(url)
         self.assertEqual(urlparams["cancel_uri"], "http://cancel")
 
     def test_url_contains_nonce(self):
         params = self.make_mock_params({"somekey":"someval"})
         url = self.urlbuilder.build_and_sign(params)
-        urlparams = self.get_url_params(url)
+        urlparams = get_url_params(url)
         self.assertIsNotNone(urlparams["nonce"])
 
     def test_url_nonce_is_random(self):
         params = self.make_mock_params({"somekey":"somval"})
         url1 = self.urlbuilder.build_and_sign(params)
         url2 = self.urlbuilder.build_and_sign(params)
-        self.assertNotEqual(self.get_url_params(url1)["nonce"],\
-                self.get_url_params(url2)["nonce"])
+        self.assertNotEqual(get_url_params(url1)["nonce"],\
+                get_url_params(url2)["nonce"])
 
     def test_url_contains_client_id(self):
         params = self.make_mock_params({"somekey":"someval"})
         url = self.urlbuilder.build_and_sign(params)
-        urlparams = self.get_url_params(url)
+        urlparams = get_url_params(url)
         self.assertEqual(urlparams["client_id"], self.app_id)
 
     def test_url_contains_resource_name(self):
@@ -252,9 +276,49 @@ class UrlBuilderTestCase(unittest.TestCase):
             datetime.datetime.now.return_value = testdate
             params = self.make_mock_params({"somekey":"somval"})
             url = self.urlbuilder.build_and_sign(params)
-            urlparams = self.get_url_params(url)
+            urlparams = get_url_params(url)
             self.assertEqual(urlparams["timestamp"], testdate.isoformat()[:-7] + "Z")
 
+class MerchantUrlTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = Client(**mock_account_details)
+        self.mock_auth_code = ("DlydRBP+1iHjxPUBtNTtO5jCldrkbnrdhpaaVqiU1F4mkhwi"
+            "MJQCNlAJ6fPSN65NY")
+
+    def test_merchant_url_parameters(self):
+        url = self.client.new_merchant_url("http://someurl")
+        params = get_url_params(url)
+        expected = {
+                "client_id":mock_account_details["app_id"],
+                "redirect_uri":"http://someurl",
+                "scope":"manage_merchant",
+                "response_type":"code"
+                }
+        self.assertEqual(expected, params)
+    
+    def test_merchant_url_state(self):
+        url = self.client.new_merchant_url("http://someurl", state="thestate")
+        params = get_url_params(url)
+        self.assertEqual(params["state"], "thestate")
+
+
+    def test_fetch_client_access_token_basic_authorization(self):
+        expected_data = {
+                "client_id":mock_account_details["app_id"],
+                "code":self.mock_auth_code,
+                "redirect_uri":"http://someurl",
+                "grant_type":"authorization_code"
+                }
+        expected_auth = base64.b64encode("{0}:{1}".format(
+            mock_account_details["app_id"],
+            mock_account_details["app_secret"]))
+        with patch.object(self.client, 'api_post') as mock_post:
+            mock_post.return_value = "fadsfhaskljfbaskldjbf"
+            self.client.fetch_access_token(expected_data["redirect_uri"],
+                    self.mock_auth_code)
+            mock_post.assert_called_with("https://gocardless.com/oauth/"
+                "access_token", expected_data, auth=expected_auth)
+        pass
 
 
 class Matcher(object):
@@ -283,7 +347,8 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
             c = Client(**mock_account_details)
             getattr(c, method)(*args)
             matcher = Matcher(lambda x: type(x) == expected_type)
-            mock_inst.build_and_sign.assert_called_with(matcher)
+            mock_inst.build_and_sign.assert_called_with(matcher,
+                    cancel_uri=None, redirect_uri=None, state=None)
     
     def test_new_preauth_calls_urlbuilder(self):
         self.urlbuilder_argument_check("new_preauthorization_url", 

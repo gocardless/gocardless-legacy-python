@@ -7,10 +7,10 @@ import urllib
 
 import gocardless
 import urlbuilder
-from .utils import generate_signature, to_query
-from .request import Request
-from .exceptions import ClientError, SignatureError
-from .resources import Merchant, Subscription, Bill, PreAuthorization, User
+from gocardless.utils import generate_signature, to_query
+from gocardless.request import Request
+from gocardless.exceptions import ClientError, SignatureError
+from gocardless.resources import Merchant, Subscription, Bill, PreAuthorization, User
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +84,11 @@ class Client(object):
             request.use_bearer_auth(self._access_token)
 
         request.set_payload(kwargs.get('data'))        
-        return request.perform()
+        response = request.perform()
+        if "error" in response.keys():
+            raise ClientError("Error calling api, message was {0}".format(
+                response["error"]))
+        return response
         
     def merchant(self):
         """
@@ -152,9 +156,9 @@ class Client(object):
                 interval_length, interval_unit, name=name, 
                 description=description, interval_count=interval_count, 
                 expires_at=expires_at, start_at=start_at)
-        builder = urlbuilder.UrlBuilder(self, redirect_uri=redirect_uri, 
+        builder = urlbuilder.UrlBuilder(self)
+        return builder.build_and_sign(params, redirect_uri=redirect_uri, 
                 cancel_uri=cancel_uri, state=state)
-        return builder.build_and_sign(params)
 
         
     def new_bill_url(self, amount, name=None, description=None,
@@ -173,9 +177,9 @@ class Client(object):
         """
         params = urlbuilder.BillParams(amount, self._merchant_id, name=name, 
                 description=description)
-        builder = urlbuilder.UrlBuilder(self, redirect_uri=redirect_uri, 
+        builder = urlbuilder.UrlBuilder(self)
+        return builder.build_and_sign(params, redirect_uri=redirect_uri, 
                 cancel_uri=cancel_uri, state=state)
-        return builder.build_and_sign(params)
         
     def new_preauthorization_url(self,max_amount, interval_length,\
             interval_unit, expires_at=None, name=None, description=None,\
@@ -212,8 +216,9 @@ class Client(object):
         params = urlbuilder.PreAuthorizationParams(max_amount, self._merchant_id, \
             interval_length, interval_unit, expires_at=expires_at, name=name, description=description,\
             interval_count=interval_count, calendar_intervals=calendar_intervals)
-        builder = urlbuilder.UrlBuilder(self, redirect_uri=redirect_uri, cancel_uri=cancel_uri, state=state)
-        return builder.build_and_sign(params)
+        builder = urlbuilder.UrlBuilder(self)
+        return builder.build_and_sign(params, redirect_uri=redirect_uri, 
+                cancel_uri=cancel_uri, state=state)
 
     def confirm_resource(self, params):
         """Confirm a payment
@@ -239,6 +244,52 @@ class Client(object):
                 }
         self.api_post(params["resource_uri"], to_post, auth=auth_string)
         
+    def new_merchant_url(self, redirect_uri, state=None):
+        """Get a URL for managing a new merchant
+
+        This method creates a URL which partners should redirect
+        merchants to in order to obtain permission to manage their GoCardless
+        payments.
+        :param redirect_uri: The URI where the merchant will be sent after
+        authorizing.
+        :param state: An optional string which will be present in the request
+        to the redirect URI, useful for tracking the user.
+        """
+        params = {
+                "client_id":self._app_id,
+                "redirect_uri":redirect_uri,
+                "scope":"manage_merchant",
+                "response_type":"code"
+                }
+        if state:
+            params["state"] = state
+        return "{0}/oauth/authorize?{1}".format(self.get_base_url(),
+                to_query(params))
+
+    def fetch_access_token(self, redirect_uri, authorization_code):
+        """Fetch the access token for a merchant
+
+        Takes the authorization code obtained from a merchant redirect
+        and the redirect_uri used in that same redirect and fetches the
+        corresponding access token. The access token is returned and also
+        set on the client so the client can then be used to make api calls
+        on behalf of the merchant.
+
+        :param redirect_uri: The redirect_uri used in the request which 
+        obtained the authorization code, must match exactly.
+        :param authorization_code: The authorization code obtained in the
+        previous part of the process.
+        """
+        params = {
+                "client_id":self._app_id,
+                "code":authorization_code,
+                "redirect_uri":redirect_uri,
+                "grant_type":"authorization_code"
+                }
+        auth = base64.b64encode("{0}:{1}".format(self._app_id, 
+            self._app_secret))
+        url = "{0}/oauth/access_token".format(self.get_base_url())
+        return self.api_post(url, params, auth=auth)
 
 
 
