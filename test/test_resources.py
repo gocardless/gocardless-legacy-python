@@ -48,7 +48,7 @@ class ResourceTestCase(unittest.TestCase):
         for key, value in attrs.items():
             self.assertEqual(getattr(res, key), value)
 
-    def test_resource_created_at_modified_at_are_dates(self):
+    def test_resource_created_at_is_date(self):
         created = datetime.datetime.strptime('2012-04-18T17:53:12Z',\
                 "%Y-%m-%dT%H:%M:%SZ")
         attrs = create_mock_attrs({"created_at":'2012-04-18T17:53:12Z',
@@ -111,6 +111,39 @@ class FindResourceTestCase(unittest.TestCase):
         mock_client.api_get.return_value = {"id":"1"}
         self.assertEqual(TestResource.find("1").id, "1")
 
+
+
+class TestDateResource(Resource):
+    endpoint = "/dates"
+    date_fields = ["modified", "activated"]
+
+
+class DateMetaClassTestCase(unittest.TestCase):
+
+    def test_date_fields_are_converted(self):
+        mod_date = datetime.datetime.strptime("2020-10-10T01:01:00", "%Y-%m-%dT%H:%M:%S")
+        act_date = datetime.datetime.strptime("2020-10-10T01:01:03", "%Y-%m-%dT%H:%M:%S")
+        params = {
+                "modified":mod_date.isoformat() + "Z",
+                "activated":act_date.isoformat() + "Z"
+                }
+        res = TestDateResource(create_mock_attrs(params), None)
+        self.assertEqual(res.modified, mod_date)
+        self.assertEqual(res.activated, act_date)
+
+
+class TestReferenceResource(Resource):
+    endpoint = "/referencing"
+    reference_fields = ["test_resource"]
+
+
+class ReferenceResourceTestCase(unittest.TestCase):
+    
+    def test_reference_fields_are_converted(self):
+        params = create_mock_attrs({"test_resource_id":"2345"})
+        res = TestReferenceResource(params, None)
+        self.assertTrue(hasattr(res, "test_resource"))
+        self.assertTrue(callable, res.test_resource)
 
 
 

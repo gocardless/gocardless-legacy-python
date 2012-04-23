@@ -88,6 +88,14 @@ class ClientTestCase(unittest.TestCase):
             self.assertEqual(ex.exception.message, "Error calling api, message"
                 " was anerrormessage")
 
+    def test_error_when_result_is_list(self):
+        with patch('gocardless.client.Request') as mock_req_mod:
+            mock_request = mock.Mock()
+            mock_request.perform.return_value = ["one", "two"]
+            mock_req_mod.return_value = mock_request
+            self.client.api_get("/somepath")
+
+
     def test_base_url_returns_the_correct_url_for_production(self):
         gocardless.environment = 'production'
         self.assertEqual(Client.get_base_url(), 'https://gocardless.com')
@@ -284,6 +292,11 @@ class MerchantUrlTestCase(unittest.TestCase):
         self.client = Client(**mock_account_details)
         self.mock_auth_code = ("DlydRBP+1iHjxPUBtNTtO5jCldrkbnrdhpaaVqiU1F4mkhwi"
             "MJQCNlAJ6fPSN65NY")
+        self.access_token_response = {
+                    "access_token":"thetoken",
+                    "token_type":"bearer",
+                    "scope":"manage_merchant:themanagedone"
+                    }
 
     def test_merchant_url_parameters(self):
         url = self.client.new_merchant_url("http://someurl")
@@ -295,6 +308,7 @@ class MerchantUrlTestCase(unittest.TestCase):
                 "response_type":"code"
                 }
         self.assertEqual(expected, params)
+
     
     def test_merchant_url_state(self):
         url = self.client.new_merchant_url("http://someurl", state="thestate")
@@ -313,12 +327,20 @@ class MerchantUrlTestCase(unittest.TestCase):
             mock_account_details["app_id"],
             mock_account_details["app_secret"]))
         with patch.object(self.client, 'api_post') as mock_post:
-            mock_post.return_value = "fadsfhaskljfbaskldjbf"
+            mock_post.return_value = self.access_token_response
             self.client.fetch_access_token(expected_data["redirect_uri"],
                     self.mock_auth_code)
             mock_post.assert_called_with("https://gocardless.com/oauth/"
                 "access_token", expected_data, auth=expected_auth)
-        pass
+
+    def test_fetch_client_sets_access_token(self):
+        with patch.object(self.client, 'api_post') as mock_post:
+            mock_post.return_value = self.access_token_response
+            result = self.client.fetch_access_token("http://someuri",
+                    "someauthcode")
+            self.assertEqual(result, "thetoken")
+            self.assertEqual(self.client._token, "thetoken")
+            self.assertEqual(self.client._merchant_id, "themanagedone")
 
 
 class Matcher(object):
