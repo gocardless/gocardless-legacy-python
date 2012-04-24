@@ -126,6 +126,19 @@ class Client(object):
         """
         return Bill.find_with_client(id, self)
 
+    def create_bill(self, amount, pre_auth_id, name=None, description=None):
+        """Creates a new bill under an existing pre_authorization
+
+        :param amount: The amount to bill
+        :param pre_auth_id: The id of an existing pre_authorization which 
+        has not expire
+        :param name: A name for this bill
+        :param description: A description for this bill
+        """
+        return Bill.create_under_preauth(amount, pre_auth_id, self, 
+                name=name, description=description)
+        
+
     def new_subscription_url(self, amount, interval_length, interval_unit, 
             name=None, description=None, interval_count=None, start_at=None,
             expires_at=None, redirect_uri=None, cancel_uri=None, state=None):

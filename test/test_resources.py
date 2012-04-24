@@ -29,7 +29,9 @@ def create_mock_attrs(to_merge):
     """
     attrs = {
             "created_at":"2012-04-18T17:53:12Z", 
-            "id":"1"}
+            "id":"1",
+            "merchant_id":"amerchantid"
+            }
     attrs.update(to_merge)
     return attrs
 
@@ -55,6 +57,15 @@ class ResourceTestCase(unittest.TestCase):
                "id":"1"})
         res = TestResource(attrs, None)
         self.assertEqual(res.created_at, created)
+
+    def test_resources_with_equal_attrs_are_equal(self):
+        attrs = create_mock_attrs({
+            "someattr":"someval"
+            })
+        res1 = TestResource(attrs, None)
+        res2 = TestResource(attrs, None)
+        self.assertEqual(res1, res2)
+        self.assertEqual(hash(res1), hash(res2))
 
 class ResourceSubresourceTestCase(unittest.TestCase):
 
@@ -118,7 +129,7 @@ class TestDateResource(Resource):
     date_fields = ["modified", "activated"]
 
 
-class DateMetaClassTestCase(unittest.TestCase):
+class DateResourceFieldTestCase(unittest.TestCase):
 
     def test_date_fields_are_converted(self):
         mod_date = datetime.datetime.strptime("2020-10-10T01:01:00", "%Y-%m-%dT%H:%M:%S")
@@ -134,8 +145,8 @@ class DateMetaClassTestCase(unittest.TestCase):
 
 class TestReferenceResource(Resource):
     endpoint = "/referencing"
-    reference_fields = ["test_resource"]
-
+    reference_fields = ["test_resource_id"]
+    date_fields = []
 
 class ReferenceResourceTestCase(unittest.TestCase):
     
@@ -144,6 +155,25 @@ class ReferenceResourceTestCase(unittest.TestCase):
         res = TestReferenceResource(params, None)
         self.assertTrue(hasattr(res, "test_resource"))
         self.assertTrue(callable, res.test_resource)
+    
+    def test_reference_function_calls_resource(self):
+        params = create_mock_attrs({"test_resource_id":"2345"})
+        res = TestReferenceResource(params, None)
+        with patch.object(TestResource, 
+                'find_with_client') as mock_res:
+            mock_res.return_value = "1234"
+            self.assertEqual("1234", res.test_resource())
+            mock_res.assert_called_with("2345", None)
 
+    def test_date_fields_inherited(self):
+        params = create_mock_attrs({"test_resource_id":"123"})
+        res = TestReferenceResource(params, None)
+        self.assertIsInstance(res.created_at, datetime.datetime)
+
+    def test_date_with_null_attr_does_not_throw(self):
+        params = create_mock_attrs({"modified_at":None})
+        testclass = type("TestModResource", (Resource,), 
+                {"date_fields":["modified_at"]})
+        res = testclass(params, None)
 
 

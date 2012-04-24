@@ -8,11 +8,25 @@ import types
 import utils
 import gocardless
 from gocardless.exceptions import ClientError
+
+
+class ResourceMetaClass(type):
+
+    def __new__(meta, name, bases, attrs):
+        #resoures inherit date fields from superclasses
+        for base in bases:
+            if hasattr(base, "date_fields") and "date_fields" in attrs:
+                attrs["date_fields"].extend(base.date_fields)
+        return type.__new__(meta, name, bases, attrs)
+
 class Resource(object):
-    date_fields = []
+    __metaclass__ = ResourceMetaClass
+
+    date_fields = ["created_at"]
     reference_fields = []
 
     def __init__(self, attrs, client):
+        self._raw_attrs = attrs.copy()
         self.id = attrs["id"]
         self.client = client
         if "sub_resource_uris" in attrs:
@@ -33,14 +47,17 @@ class Resource(object):
                 func_name = "get_{0}".format(name)
                 res_func.name = func_name
                 setattr(self, func_name, types.MethodType(res_func, self, self.__class__))
-        self.created_at = datetime.datetime.strptime(attrs.pop("created_at"), "%Y-%m-%dT%H:%M:%SZ")
 
         for fieldname in self.date_fields:
             val = attrs.pop(fieldname)
-            setattr(self, fieldname, datetime.datetime.strptime(val, "%Y-%m-%dT%H:%M:%SZ"))
+            if val is not None:
+                setattr(self, fieldname, 
+                        datetime.datetime.strptime(val, "%Y-%m-%dT%H:%M:%SZ"))
+            else:
+                setattr(self, fieldname, None)
 
         for fieldname in self.reference_fields:
-            id = attrs.pop(fieldname + "_id")
+            id = attrs.pop(fieldname)
             def create_get_func(the_klass, the_id):
                 def get_referenced_resource(inst):
                     return the_klass.find_with_client(the_id, self.client)
@@ -62,6 +79,14 @@ class Resource(object):
     def get_endpoint(self):
         return self.endpoint.replace(":id", self.id)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._raw_attrs == other._raw_attrs
+        return False
+    
+    def __hash__(self):
+        return hash(self._raw_attrs["id"])
+
     @classmethod
     def find_with_client(cls, id, client):
         path = cls.endpoint.replace(":id", id)
@@ -77,17 +102,38 @@ class Resource(object):
 
 class Merchant(Resource):
     endpoint = "/merchants/:id"
+    date_fields = ["next_payout_date"]
 
 class Subscription(Resource):
     endpoint = "/subscriptions/:id"
+    reference_fields = ["user_id", "merchant_id"]
+    date_fields = ["expires_at", "next_interval_start"]
 
 class PreAuthorization(Resource):
     endpoint = "/pre_authorizations/:id"
+    date_fields = ["expires_at", "next_interval_start"]
+    reference_fields = ["user_id", "merchant_id"]
 
 class Bill(Resource):
     endpoint = "/bills/:id"
+    date_fields = ["paid_at"]
+    reference_fields = ["merchant_id", "user_id"]
+
+    @classmethod
+    def create_under_preauth(self, amount, pre_auth_id, client, name=None, 
+            description=None):
+        path = "/bills"
+        params = {"bill":{
+                    "amount":amount,
+                    "pre_authorization_id":pre_auth_id
+                    }
+                 }
+        if name:
+            params["name"] = name
+        if description:
+            params["description"] = description
+        return Bill(client.api_post(path, params), client)
+
 
 class User(Resource):
     endpoint = "/users/:id"
-
-    

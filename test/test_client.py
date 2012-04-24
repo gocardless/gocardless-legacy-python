@@ -10,8 +10,7 @@ import urlparse
 import gocardless
 import gocardless.client
 from gocardless.client import Client
-from gocardless import utils
-from gocardless import urlbuilder
+from gocardless import utils, urlbuilder, resources
 from gocardless.exceptions import SignatureError, ClientError
 from test_resources import create_mock_attrs
 
@@ -26,7 +25,7 @@ merchant_json = json.loads("""{
    "uri": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1",
    "balance": "12.00",
    "pending_balance": "0.00",
-   "next_payout_date": "2011-11-25T17: 07: 09Z",
+   "next_payout_date": "2011-11-25T17:07:09Z",
    "next_payout_amount": "12.00",
    "sub_resource_uris": {
       "users": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/users",
@@ -58,6 +57,25 @@ subscription_json = json.loads("""
    }
 }
 """)
+
+bill_json = json.loads("""
+{
+   "amount": "10.00",
+   "gocardless_fees": "0.10",
+   "partner_fees": "0",
+   "currency": "GBP",
+   "created_at": "2011-11-22T11:59:12Z",
+   "description": null,
+   "id": "PWSDXRYSCOKA7Z",
+   "name": null,
+   "status": "pending",
+   "merchant_id": "6UFY9IJWGYBTAP",
+   "user_id": "BWJ2GP659OXPAU",
+   "paid_at": null,
+   "source_type": "pre_authorization",
+   "source_id": "FAZ6FGSMTCOZUG",
+   "uri": "https://gocardless.com/api/v1/bills/PWSDXRYSCOKA7Z"
+}""")
 
 mock_account_details = {
             'app_id': 'id01',
@@ -134,10 +152,19 @@ class ClientTestCase(unittest.TestCase):
         self.get_resource_tester("user", create_mock_attrs({}))
 
     def test_get_pre_authorization(self):
-        self.get_resource_tester("pre_authorization", create_mock_attrs({}))
+        mock_date = datetime.datetime.now().isoformat()[:-7] + "Z"
+        mock_attrs = {
+                "user_id":"123456",
+                "expires_at":mock_date,
+                "next_interval_start":mock_date
+                }
+        self.get_resource_tester("pre_authorization", 
+                create_mock_attrs(mock_attrs))
 
     def test_get_bill(self):
-        self.get_resource_tester("bill", create_mock_attrs({}))
+        self.get_resource_tester("bill", create_mock_attrs(
+                {"paid_at":datetime.datetime.now().isoformat()[:-7] + "Z",
+                "user_id":"someuserid"}))
 
     def get_resource_tester(self, resource_name, resource_fixture):
         expected_klass = getattr(sys.modules["gocardless.resources"], utils.camelize(resource_name))
@@ -150,6 +177,20 @@ class ClientTestCase(unittest.TestCase):
     def test_set_details_creates_client(self):
         gocardless.set_details(mock_account_details)
         self.assertIsNotNone(gocardless.global_client)
+
+    def test_create_bill(self):
+        with patch.object(self.client, 'api_post') as mock_post:
+            expected_path = "/bills"
+            expected_params = {
+                    "amount":10,
+                    "pre_authorization_id": "someid"
+                    }
+            mock_bill = resources.Bill(bill_json.copy(), self.client)
+            mock_post.return_value = bill_json
+            res = self.client.create_bill(10, "someid")
+            mock_post.assert_called_with("/bills", 
+                    {"bill":expected_params})
+            self.assertEqual(res, mock_bill)
 
 class ConfirmResourceTestCase(unittest.TestCase):
 
