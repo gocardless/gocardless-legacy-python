@@ -230,9 +230,11 @@ class Client(object):
         redirect.
 
         """
-        params = urlbuilder.PreAuthorizationParams(max_amount, self._merchant_id, \
-            interval_length, interval_unit, expires_at=expires_at, name=name, description=description,\
-            interval_count=interval_count, calendar_intervals=calendar_intervals)
+        params = urlbuilder.PreAuthorizationParams(max_amount, 
+                self._merchant_id, interval_length, interval_unit, 
+                expires_at=expires_at, name=name, description=description, 
+                interval_count=interval_count, 
+                calendar_intervals=calendar_intervals)
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri, 
                 cancel_uri=cancel_uri, state=state)
