@@ -7,81 +7,18 @@ from mock import patch
 import sys
 import urlparse
 
+import fixtures
 import gocardless
 import gocardless.client
 from gocardless.client import Client
 from gocardless import utils, urlbuilder, resources
 from gocardless.exceptions import SignatureError, ClientError
 from test_resources import create_mock_attrs
-
-merchant_json = json.loads("""{
-   "created_at": "2011-11-18T17:07:09Z",
-   "description": null,
-   "id": "WOQRUJU9OH2HH1",
-   "name": "Tom's Delicious Chicken Shop",
-   "first_name": "Tom",
-   "last_name": "Blomfield",
-   "email": "tom@gocardless.com",
-   "uri": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1",
-   "balance": "12.00",
-   "pending_balance": "0.00",
-   "next_payout_date": "2011-11-25T17:07:09Z",
-   "next_payout_amount": "12.00",
-   "sub_resource_uris": {
-      "users": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/users",
-      "bills": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/bills",
-      "pre_authorizations": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/pre_authorizations",
-      "subscriptions": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/subscriptions"
-   }
-}
-""")
-
-subscription_json = json.loads("""
-{
-   "amount":"44.0",
-   "interval_length":1,
-   "interval_unit":"month",
-   "created_at":"2011-09-12T13:51:30Z",
-   "currency":"GBP",
-   "name":"London Gym Membership",
-   "description":"Entitles you to use all of the gyms around London",
-   "expires_at":null,
-   "next_interval_start":"2011-10-12T13:51:30Z",
-   "id": "AJKH638A99",
-   "merchant_id":"WOQRUJU9OH2HH1",
-   "status":"active",
-   "user_id":"HJEH638AJD",
-   "uri":"https://gocardless.com/api/v1/subscriptions/1580",
-   "sub_resource_uris":{
-      "bills":"https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/bills?source_id=1580"
-   }
-}
-""")
-
-bill_json = json.loads("""
-{
-   "amount": "10.00",
-   "gocardless_fees": "0.10",
-   "partner_fees": "0",
-   "currency": "GBP",
-   "created_at": "2011-11-22T11:59:12Z",
-   "description": null,
-   "id": "PWSDXRYSCOKA7Z",
-   "name": null,
-   "status": "pending",
-   "merchant_id": "6UFY9IJWGYBTAP",
-   "user_id": "BWJ2GP659OXPAU",
-   "paid_at": null,
-   "source_type": "pre_authorization",
-   "source_id": "FAZ6FGSMTCOZUG",
-   "uri": "https://gocardless.com/api/v1/bills/PWSDXRYSCOKA7Z"
-}""")
-
 mock_account_details = {
             'app_id': 'id01',
             'app_secret': 'sec01',
             'token': 'tok01',
-            'merchant_id': merchant_json["id"],
+            'merchant_id': fixtures.merchant_json["id"],
         }
 def create_mock_client(details):
     return Client(details["app_id"],
@@ -136,12 +73,12 @@ class ClientTestCase(unittest.TestCase):
 
     def test_get_merchant(self):
         with patch.object(self.client, 'api_get'):
-            self.client.api_get.return_value = merchant_json
+            self.client.api_get.return_value = fixtures.merchant_json
             merchant = self.client.merchant()
             self.assertEqual(merchant.id, self.account_details["merchant_id"])
 
     def test_get_subscription(self):
-        self.get_resource_tester("subscription", subscription_json)
+        self.get_resource_tester("subscription", fixtures.subscription_json)
 
     def test_get_user(self):
         self.get_resource_tester("user", create_mock_attrs({}))
@@ -180,8 +117,8 @@ class ClientTestCase(unittest.TestCase):
                     "amount":10,
                     "pre_authorization_id": "someid"
                     }
-            mock_bill = resources.Bill(bill_json.copy(), self.client)
-            mock_post.return_value = bill_json
+            mock_bill = resources.Bill(fixtures.bill_json.copy(), self.client)
+            mock_post.return_value = fixtures.bill_json
             res = self.client.create_bill(10, "someid")
             mock_post.assert_called_with("/bills", 
                     {"bill":expected_params})
