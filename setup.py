@@ -7,6 +7,7 @@ setup(
         author_email="alex@gocardless.com",
         url="http://gocardless.com",
         description="Python client library for GoCardless",
-        packages=["gocardless"]
+        packages=["gocardless"],
+        requires=["requests"]
         )
 
