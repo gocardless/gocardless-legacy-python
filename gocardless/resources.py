@@ -45,7 +45,7 @@ class Resource(object):
                         return [the_klass(attrs, self.client) for attrs in data]
                     return get_resources
                 res_func = create_get_resource_func(path, sub_klass)
-                func_name = "get_{0}".format(name)
+                func_name = "{0}".format(name)
                 res_func.name = func_name
                 setattr(self, func_name, types.MethodType(res_func, self, self.__class__))
 
@@ -120,6 +120,10 @@ class PreAuthorization(Resource):
     date_fields = ["expires_at", "next_interval_start"]
     reference_fields = ["user_id", "merchant_id"]
 
+    def create_bill(self, amount, name=None, description=None):
+        return Bill.create_under_preauth(amount, self.id, self.client,
+                name=name, description=description)
+
 class Bill(Resource):
     endpoint = "/bills/:id"
     date_fields = ["paid_at"]
@@ -135,9 +139,9 @@ class Bill(Resource):
                     }
                  }
         if name:
-            params["name"] = name
+            params["bill"]["name"] = name
         if description:
-            params["description"] = description
+            params["bill"]["description"] = description
         return Bill(client.api_post(path, params), client)
 
 

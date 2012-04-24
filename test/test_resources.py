@@ -7,7 +7,7 @@ import unittest
 
 import fixtures
 import gocardless
-from gocardless.resources import Resource, Subscription
+from gocardless.resources import Resource, Subscription, Bill, PreAuthorization
 
 class TestResource(Resource):
     endpoint = "/testendpoint/:id"
@@ -80,15 +80,15 @@ class ResourceSubresourceTestCase(unittest.TestCase):
             None)
 
     def test_resource_lists_subresources(self):
-        self.assertTrue(hasattr(self.resource, "get_test_sub_resources"))
-        self.assertTrue(callable(getattr(self.resource, "get_test_sub_resources")))
+        self.assertTrue(hasattr(self.resource, "test_sub_resources"))
+        self.assertTrue(callable(getattr(self.resource, "test_sub_resources")))
 
     def test_resource_subresource_returns_subresource_instances(self):
         mock_return = map(create_mock_attrs, [{"id":1},{"id":2}])
         mock_client = mock.Mock()
         mock_client.api_get.return_value = mock_return
         self.resource.client = mock_client
-        result = self.resource.get_test_sub_resources()
+        result = self.resource.test_sub_resources()
         for res in result:
             self.assertIsInstance(res, TestSubResource)
         self.assertEqual(set([1,2]), set([item.id for item in result]))
@@ -103,7 +103,7 @@ class ResourceSubresourceTestCase(unittest.TestCase):
         mock_client = mock.Mock()
         mock_client.api_get.return_value = [create_mock_attrs({"id":"1"})]
         self.resource.client = mock_client
-        result = self.resource.get_test_sub_resources()
+        result = self.resource.test_sub_resources()
         self.assertIsInstance(result[0], TestSubResource)
         
 
@@ -186,6 +186,35 @@ class SubscriptionCancelTestCase(unittest.TestCase):
         sub.cancel()
         client.api_put.assert_called_with("/subscriptions/{0}/cancel".format(
             fixtures.subscription_json["id"]))
+
+
+
+
+class PreAuthBillCreationTestCase(unittest.TestCase):
+    
+    def test_create_bill_calls_client_api_post(self):
+        client = mock.Mock()
+        client.api_post.return_value = fixtures.bill_json
+        result = Bill.create_under_preauth(10, "1234", client, name="aname",
+                description="adesc")
+        self.assertIsInstance(result, Bill)
+        expected_params = {
+                "bill":{
+                    "amount":10,
+                    "pre_authorization_id":"1234",
+                    "name":"aname",
+                    "description":"adesc"
+                    }
+                }
+        client.api_post.assert_called_with("/bills", expected_params)
+
+    @patch('gocardless.resources.Bill')
+    def test_preauth_create_calls_bill_create(self, mock_bill_class):
+       pre_auth = PreAuthorization(fixtures.preauth_json, None)
+       pre_auth.create_bill(10, name="aname", description="adesc")
+       mock_bill_class.create_under_preauth.assert_called_with(10,
+               pre_auth.id, None, name="aname",
+               description="adesc")
 
 
 

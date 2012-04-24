@@ -63,4 +63,24 @@ bill_json = json.loads("""
    "uri": "https://gocardless.com/api/v1/bills/PWSDXRYSCOKA7Z"
 }""")
 
-
+preauth_json = json.loads("""
+{
+   "created_at":"2011-02-18T15:25:58Z",
+   "currency":"GBP",
+   "name":"Variable Payments For Tennis Court Rental",
+   "description":"You will be charged according to your monthly usage of the tennis courts",
+   "expires_at":null,
+   "id": "1234JKH8KLJ",
+   "interval_length":1,
+   "interval_unit":"month",
+   "merchant_id": "WOQRUJU9OH2HH1",
+   "status":"active",
+   "remaining_amount": "65.0",
+   "next_interval_start": "2012-02-20T00:00:00Z",
+   "user_id": "834JUH8KLJ",
+   "max_amount":"70.0",
+   "uri":"https://gocardless.com/api/v1/pre_authorizations/1609",
+   "sub_resource_uris":{
+      "bills":"https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/bills?source_id=1609"
+   }
+}""")
