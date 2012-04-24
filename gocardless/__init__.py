@@ -13,5 +13,8 @@ def set_details(details):
     - merchant_id
     """
     global global_client
-    global_client = Client(**details)
+    global_client = Client(details["app_id"],
+            details["app_secret"],
+            access_token=details["token"],
+            merchant_id=details["merchant_id"])
 

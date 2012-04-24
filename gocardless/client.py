@@ -33,20 +33,14 @@ class Client(object):
         """
         return cls.base_url or cls.BASE_URLS[gocardless.environment]
 
-    def __init__(self, **account_details):
-        if 'app_id' not in account_details:
-            raise ValueError('You must provide an app_id')
-
-        if 'app_secret' not in account_details:
-            raise ValueError('You must provide an app_secret')
-
-        if "token" not in account_details:
-            raise ValueError("You must provide an access token")
-
-        self._app_id = account_details['app_id']
-        self._app_secret = account_details['app_secret']
-        self._access_token = account_details.get('token')
-        self._merchant_id = account_details.get('merchant_id')
+    def __init__(self, app_id, app_secret, access_token=None, 
+            merchant_id=None):
+        self._app_id = app_id
+        self._app_secret = app_secret
+        if access_token:
+            self._access_token = access_token
+        if merchant_id:
+            self._merchant_id = merchant_id
 
     def api_get(self, path, **kwargs):
         """

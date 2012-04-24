@@ -83,6 +83,11 @@ mock_account_details = {
             'token': 'tok01',
             'merchant_id': merchant_json["id"],
         }
+def create_mock_client(details):
+    return Client(details["app_id"],
+            details["app_secret"],
+            access_token=details["token"],
+            merchant_id=details["merchant_id"])
 
 def get_url_params(url):
     param_dict = urlparse.parse_qs(urlparse.urlparse(url).query)
@@ -94,7 +99,7 @@ class ClientTestCase(unittest.TestCase):
 
     def setUp(self):
         self.account_details = mock_account_details.copy()
-        self.client = Client(**self.account_details)
+        self.client = create_mock_client(self.account_details)
 
     def test_error_raises_clienterror(self):
         with patch('gocardless.client.Request') as mock_request_module:
@@ -128,16 +133,6 @@ class ClientTestCase(unittest.TestCase):
         Client.base_url = 'https://abc.gocardless.com'
         self.assertEqual(Client.get_base_url(), 'https://abc.gocardless.com')
         Client.base_url = old_url
-
-    def test_app_id_required(self):
-        self.account_details.pop('app_id')
-        with self.assertRaises(ValueError):
-            Client(**self.account_details)
-
-    def test_app_secret_required(self):
-        self.account_details.pop('app_secret')
-        with self.assertRaises(ValueError):
-            Client(**self.account_details)
 
     def test_get_merchant(self):
         with patch.object(self.client, 'api_get'):
@@ -195,7 +190,7 @@ class ClientTestCase(unittest.TestCase):
 class ConfirmResourceTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.client = Client(**mock_account_details)
+        self.client = create_mock_client(mock_account_details)
         self.params =  {
                 "resource_uri":"http://aresource",
                 "resource_id":"1",
@@ -330,7 +325,7 @@ class UrlBuilderTestCase(unittest.TestCase):
 
 class MerchantUrlTestCase(unittest.TestCase):
     def setUp(self):
-        self.client = Client(**mock_account_details)
+        self.client = create_mock_client(mock_account_details)
         self.mock_auth_code = ("DlydRBP+1iHjxPUBtNTtO5jCldrkbnrdhpaaVqiU1F4mkhwi"
             "MJQCNlAJ6fPSN65NY")
         self.access_token_response = {
@@ -407,7 +402,7 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
         with patch('gocardless.urlbuilder.UrlBuilder') as mock_builder:
             mock_inst.build_and_sign.return_value = "http://someurl"
             mock_builder.return_value = mock_inst
-            c = Client(**mock_account_details)
+            c = create_mock_client(mock_account_details)
             getattr(c, method)(*args)
             matcher = Matcher(lambda x: type(x) == expected_type)
             mock_inst.build_and_sign.assert_called_with(matcher,
