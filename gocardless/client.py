@@ -62,8 +62,16 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to post to the url.
         """
-        self.set_payload(data)
-        return self._request('post', Client.API_PATH + path, **kwargs)
+        return self._request('post', Client.API_PATH + path, data=date, 
+                **kwargs)
+
+    def api_delete(self, path, **kwargs):
+        """Issue a delete to the API server.
+
+        :param path: the path that will be added to the API prefix
+        :param params: query string parameters
+        """
+        return self._request('delete', Client.API_PATH + path, **kwargs)
 
     def _request(self, method, path, **kwargs):
         """
@@ -96,12 +104,6 @@ class Client(object):
         """
         return Merchant(self.api_get('/merchants/%s' % self._merchant_id), self)
     
-    def users(self):
-        """
-        Index a merchant's customers 
-        """
-        return self.api_get('/merchants/%s/users' % self._merchant_id)
-
     def user(self, id):
         """
         Find a user by id
@@ -111,6 +113,8 @@ class Client(object):
     def pre_authorization(self, id):
         """
         Find a pre authorization with id `id`
+
+        :params : id - Subscription ID
         """
         return PreAuthorization.find_with_client(id, self)
     
@@ -306,8 +310,4 @@ class Client(object):
         self._token = result["access_token"]
         self._merchant_id = result["scope"].split(":")[1]
         return self._token
-
-
-
-
 

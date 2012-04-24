@@ -177,3 +177,14 @@ class ReferenceResourceTestCase(unittest.TestCase):
         res = testclass(params, None)
 
 
+class SubscriptionCancelTestCase(unittest.TestCase):
+
+    def test_cancel_puts(self):
+       client = mock.Mock()
+       client.api_put.return_value = None
+
+
+
+
+
+
