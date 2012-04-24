@@ -95,9 +95,9 @@ class Resource(object):
 
     @classmethod
     def find(cls, id):
-        if not gocardless.global_client:
+        if not gocardless.client:
             raise ClientError("You must set your account details first")
-        return cls.find_with_client(id, gocardless.global_client)
+        return cls.find_with_client(id, gocardless.client)
 
 
 

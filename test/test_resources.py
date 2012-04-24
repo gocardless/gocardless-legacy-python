@@ -118,7 +118,7 @@ class FindResourceTestCase(unittest.TestCase):
     def test_find_resource_without_details_throws_clienterror(self):
         self.assertRaises(gocardless.exceptions.ClientError, TestResource.find, "1")
 
-    @patch('gocardless.global_client')
+    @patch('gocardless.client')
     def test_find_resource_without_client(self, mock_client):
         mock_client.api_get.return_value = {"id":"1"}
         self.assertEqual(TestResource.find("1").id, "1")

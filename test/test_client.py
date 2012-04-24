@@ -39,7 +39,7 @@ class ClientTestCase(unittest.TestCase):
         self.client = create_mock_client(self.account_details)
 
     def test_error_raises_clienterror(self):
-        with patch('gocardless.client.Request') as mock_request_module:
+        with patch('gocardless.clientlib.Request') as mock_request_module:
             mock_request = mock.Mock()
             mock_request.perform.return_value = {"error":"anerrormessage"}
             mock_request_module.return_value = mock_request
@@ -49,7 +49,7 @@ class ClientTestCase(unittest.TestCase):
                 " was anerrormessage")
 
     def test_error_when_result_is_list(self):
-        with patch('gocardless.client.Request') as mock_req_mod:
+        with patch('gocardless.clientlib.Request') as mock_req_mod:
             mock_request = mock.Mock()
             mock_request.perform.return_value = ["one", "two"]
             mock_req_mod.return_value = mock_request
@@ -108,7 +108,7 @@ class ClientTestCase(unittest.TestCase):
 
     def test_set_details_creates_client(self):
         gocardless.set_details(mock_account_details)
-        self.assertIsNotNone(gocardless.global_client)
+        self.assertIsNotNone(gocardless.client)
 
     def test_create_bill(self):
         with patch.object(self.client, 'api_post') as mock_post:

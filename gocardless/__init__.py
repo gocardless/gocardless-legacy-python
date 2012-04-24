@@ -1,7 +1,10 @@
 from .client import Client
 
+#import as clientlib so that we don't shadow with the client variable
+import client as clientlib
+
 environment = 'production'
-global_client = None
+client = None
 
 def set_details(details):
     """Set the global account details to use for requests
@@ -12,8 +15,8 @@ def set_details(details):
     - token 
     - merchant_id
     """
-    global global_client
-    global_client = Client(details["app_id"],
+    global client
+    client = Client(details["app_id"],
             details["app_secret"],
             access_token=details["token"],
             merchant_id=details["merchant_id"])
