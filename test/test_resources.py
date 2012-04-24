@@ -5,8 +5,9 @@ import mock
 from mock import patch
 import unittest
 
+import fixtures
 import gocardless
-from gocardless.resources import Resource
+from gocardless.resources import Resource, Subscription
 
 class TestResource(Resource):
     endpoint = "/testendpoint/:id"
@@ -180,8 +181,11 @@ class ReferenceResourceTestCase(unittest.TestCase):
 class SubscriptionCancelTestCase(unittest.TestCase):
 
     def test_cancel_puts(self):
-       client = mock.Mock()
-       client.api_put.return_value = None
+        client = mock.Mock()
+        sub = Subscription(fixtures.subscription_json, client)
+        sub.cancel()
+        client.api_put.assert_called_with("/subscriptions/{0}/cancel".format(
+            fixtures.subscription_json["id"]))
 
 
 

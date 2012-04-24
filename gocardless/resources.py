@@ -25,7 +25,8 @@ class Resource(object):
     date_fields = ["created_at"]
     reference_fields = []
 
-    def __init__(self, attrs, client):
+    def __init__(self, in_attrs, client):
+        attrs = in_attrs.copy()
         self._raw_attrs = attrs.copy()
         self.id = attrs["id"]
         self.client = client
@@ -108,6 +109,11 @@ class Subscription(Resource):
     endpoint = "/subscriptions/:id"
     reference_fields = ["user_id", "merchant_id"]
     date_fields = ["expires_at", "next_interval_start"]
+
+    def cancel(self):
+        path = "{0}/cancel".format(self.endpoint.replace(":id", self.id))
+        self.client.api_put(path)
+
 
 class PreAuthorization(Resource):
     endpoint = "/pre_authorizations/:id"
