@@ -74,9 +74,9 @@ class Client(object):
         :param method: the HTTP method to use (e.g. +:get+, +:post+)
         :param path: the path fragment of the URL
         """
-        logger.debug("Executing request to path {0}".format(path))
         request_url = Client.get_base_url() + path
         request = Request(method, request_url)
+        logger.debug("Executing request to {0}".format(request_url))
 
         if 'auth' in kwargs:
             # If using HTTP basic auth, let requests handle it
