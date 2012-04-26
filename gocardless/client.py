@@ -302,7 +302,7 @@ class Client(object):
         auth = base64.b64encode("{0}:{1}".format(self._app_id, 
             self._app_secret))
         url = "{0}/oauth/access_token".format(self.get_base_url())
-        result =  self.api_post(url, params, auth=auth=(self._app_id, self._app_secret)
+        result =  self.api_post(url, params, auth=(self._app_id, self._app_secret))
         self._token = result["access_token"]
         self._merchant_id = result["scope"].split(":")[1]
         return self._token

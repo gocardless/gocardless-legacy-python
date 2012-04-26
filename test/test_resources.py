@@ -116,7 +116,10 @@ class FindResourceTestCase(unittest.TestCase):
         self.assertEqual(resource.id, "1")
 
     def test_find_resource_without_details_throws_clienterror(self):
+        old_client = gocardless.client
+        gocardless.client = None
         self.assertRaises(gocardless.exceptions.ClientError, TestResource.find, "1")
+        gocardless.client = old_client
 
     @patch('gocardless.client')
     def test_find_resource_without_client(self, mock_client):

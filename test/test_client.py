@@ -147,9 +147,8 @@ class ConfirmResourceTestCase(unittest.TestCase):
                     "resource_type":self.params["resource_type"],
                     "resource_id":self.params["resource_id"]
                     }
-            expected_auth = base64.b64encode("{0}:{1}".format(
-                mock_account_details["app_id"],
-                mock_account_details["app_secret"]))
+            expected_auth = (mock_account_details["app_id"],
+                mock_account_details["app_secret"])
             self.client.confirm_resource(self.params)
             mock_post.assert_called_with(self.params["resource_uri"], 
                 expected_data, auth=expected_auth)
@@ -296,9 +295,9 @@ class MerchantUrlTestCase(unittest.TestCase):
                 "redirect_uri":"http://someurl",
                 "grant_type":"authorization_code"
                 }
-        expected_auth = base64.b64encode("{0}:{1}".format(
+        expected_auth = (
             mock_account_details["app_id"],
-            mock_account_details["app_secret"]))
+            mock_account_details["app_secret"])
         with patch.object(self.client, 'api_post') as mock_post:
             mock_post.return_value = self.access_token_response
             self.client.fetch_access_token(expected_data["redirect_uri"],
