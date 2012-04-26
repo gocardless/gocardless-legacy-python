@@ -80,7 +80,7 @@ class Client(object):
 
         if 'auth' in kwargs:
             # If using HTTP basic auth, let requests handle it
-            request.use_http_auth(kwargs['auth'])
+            request.use_http_auth(*kwargs['auth'])
         else:
             # Default to using bearer auth with the access token
             request.use_bearer_auth(self._access_token)

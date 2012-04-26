@@ -124,6 +124,14 @@ class ClientTestCase(unittest.TestCase):
                     {"bill":expected_params})
             self.assertEqual(res, mock_bill)
 
+    @patch('gocardless.clientlib.Request')
+    def test_request_with_auth(self, mock_reqclass):
+        mock_request = mock.Mock()
+        mock_request.perform.return_value = ["someval"]
+        mock_reqclass.return_value = mock_request
+        self.client._request("post", "somepath", auth=("username", "password"))
+        mock_request.use_http_auth.assert_called_with("username", "password")
+
 class ConfirmResourceTestCase(unittest.TestCase):
 
     def setUp(self):
