@@ -255,7 +255,7 @@ class Client(object):
                 "resource_id":params["resource_id"],
                 "resource_type":params["resource_type"]
                 }
-        self.api_post(params["resource_uri"], to_post, auth=auth_string)
+        self.api_post(params["resource_uri"], to_post, auth=(self._app_id, self._app_secret))
         
     def new_merchant_url(self, redirect_uri, state=None):
         """Get a URL for managing a new merchant
@@ -302,7 +302,7 @@ class Client(object):
         auth = base64.b64encode("{0}:{1}".format(self._app_id, 
             self._app_secret))
         url = "{0}/oauth/access_token".format(self.get_base_url())
-        result =  self.api_post(url, params, auth=auth)
+        result =  self.api_post(url, params, auth=auth=(self._app_id, self._app_secret)
         self._token = result["access_token"]
         self._merchant_id = result["scope"].split(":")[1]
         return self._token
