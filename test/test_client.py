@@ -310,7 +310,7 @@ class MerchantUrlTestCase(unittest.TestCase):
             mock_post.return_value = self.access_token_response
             self.client.fetch_access_token(expected_data["redirect_uri"],
                     self.mock_auth_code)
-            mock_post.assert_called_with("https://gocardless.com/oauth/"
+            mock_post.assert_called_with("/oauth/"
                 "access_token", expected_data, auth=expected_auth)
 
     def test_fetch_client_sets_access_token(self):
