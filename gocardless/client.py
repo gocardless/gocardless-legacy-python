@@ -56,7 +56,7 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to post to the url.
         """
-        return self._request('post', Client.API_PATH + path, data=date, 
+        return self._request('post', Client.API_PATH + path, data=data, 
                 **kwargs)
 
     def api_delete(self, path, **kwargs):
