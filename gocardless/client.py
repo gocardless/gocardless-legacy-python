@@ -299,11 +299,10 @@ class Client(object):
                 "redirect_uri":redirect_uri,
                 "grant_type":"authorization_code"
                 }
-        auth = base64.b64encode("{0}:{1}".format(self._app_id, 
-            self._app_secret))
-        url = "/oauth/access_token"
+        query = to_query(params)
+        url = "/oauth/access_token?{0}".format(query)
         #have to use _request so we don't add api_base to the url
-        result =  self._request("post", url, data=params, auth=(self._app_id, self._app_secret))
+        result =  self._request("post", url, auth=(self._app_id, self._app_secret))
         self._token = result["access_token"]
         self._merchant_id = result["scope"].split(":")[1]
         return self._token

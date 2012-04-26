@@ -303,6 +303,7 @@ class MerchantUrlTestCase(unittest.TestCase):
                 "redirect_uri":"http://someurl",
                 "grant_type":"authorization_code"
                 }
+        query = utils.to_query(expected_data)
         expected_auth = (
             mock_account_details["app_id"],
             mock_account_details["app_secret"])
@@ -311,7 +312,7 @@ class MerchantUrlTestCase(unittest.TestCase):
             self.client.fetch_access_token(expected_data["redirect_uri"],
                     self.mock_auth_code)
             mock_request.assert_called_with("post", "/oauth/" 
-                "access_token", data=expected_data, auth=expected_auth)
+                "access_token?{0}".format(query), auth=expected_auth)
 
     def test_fetch_client_sets_access_token(self):
         with patch.object(self.client, '_request') as mock_post:
