@@ -51,7 +51,7 @@ class Client(object):
         return self._request('get', Client.API_PATH + path, **kwargs)
 
     def api_post(self, path, data, **kwargs):
-        """Issue a PUT request to the API server
+        """Issue a POST request to the API server
 
         :param path: The path that will be added to the API prefix
         :param data: The data to post to the url.
@@ -302,7 +302,8 @@ class Client(object):
         auth = base64.b64encode("{0}:{1}".format(self._app_id, 
             self._app_secret))
         url = "/oauth/access_token"
-        result =  self.api_post(url, params, auth=(self._app_id, self._app_secret))
+        #have to use _request so we don't add api_base to the url
+        result =  self._request("post", url, data=params, auth=(self._app_id, self._app_secret))
         self._token = result["access_token"]
         self._merchant_id = result["scope"].split(":")[1]
         return self._token

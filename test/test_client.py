@@ -306,15 +306,15 @@ class MerchantUrlTestCase(unittest.TestCase):
         expected_auth = (
             mock_account_details["app_id"],
             mock_account_details["app_secret"])
-        with patch.object(self.client, 'api_post') as mock_post:
-            mock_post.return_value = self.access_token_response
+        with patch.object(self.client, '_request') as mock_request:
+            mock_request.return_value = self.access_token_response
             self.client.fetch_access_token(expected_data["redirect_uri"],
                     self.mock_auth_code)
-            mock_post.assert_called_with("/oauth/"
-                "access_token", expected_data, auth=expected_auth)
+            mock_request.assert_called_with("post", "/oauth/" 
+                "access_token", data=expected_data, auth=expected_auth)
 
     def test_fetch_client_sets_access_token(self):
-        with patch.object(self.client, 'api_post') as mock_post:
+        with patch.object(self.client, '_request') as mock_post:
             mock_post.return_value = self.access_token_response
             result = self.client.fetch_access_token("http://someuri",
                     "someauthcode")
