@@ -314,13 +314,13 @@ class MerchantUrlTestCase(unittest.TestCase):
             mock_request.assert_called_with("post", "/oauth/" 
                 "access_token?{0}".format(query), auth=expected_auth)
 
-    def test_fetch_client_sets_access_token(self):
+    def test_fetch_client_sets_access_token_and_merchant_id(self):
         with patch.object(self.client, '_request') as mock_post:
             mock_post.return_value = self.access_token_response
             result = self.client.fetch_access_token("http://someuri",
                     "someauthcode")
             self.assertEqual(result, "thetoken")
-            self.assertEqual(self.client._token, "thetoken")
+            self.assertEqual(self.client._access_token, "thetoken")
             self.assertEqual(self.client._merchant_id, "themanagedone")
 
 
