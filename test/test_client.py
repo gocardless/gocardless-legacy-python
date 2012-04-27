@@ -138,7 +138,7 @@ class ConfirmResourceTestCase(unittest.TestCase):
         self.client = create_mock_client(mock_account_details)
         self.resource_path = "/somepath/morepath"
         self.params =  {
-                "resource_uri":"http://aresource.com{0}".format(
+                "resource_uri":"http://aresource.com/api/v1{0}".format(
                     self.resource_path),
                 "resource_id":"1",
                 "resource_type":"subscription",

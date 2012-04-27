@@ -257,10 +257,11 @@ class Client(object):
                 "resource_type":params["resource_type"]
                 }
         parse_rs = urlparse.urlparse(params["resource_uri"])
+        path = parse_rs.path.replace("/api/v1", "")
         if parse_rs.query != '':
-            dest = "{0}?{1}".format(parse_rs.path, parse_rs.query)
+            dest = "{0}?{1}".format(path, parse_rs.query)
         else:
-            dest = parse_rs.path
+            dest = path
         self.api_post(dest, to_post, auth=(self._app_id, self._app_secret))
         
     def new_merchant_url(self, redirect_uri, state=None):
