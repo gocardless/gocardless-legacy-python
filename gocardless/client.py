@@ -301,6 +301,8 @@ class Client(object):
                 }
         query = to_query(params)
         url = "/oauth/access_token?{0}".format(query)
+        #just to test the oauth call
+        self.base_url = "http://sandbox.gocardless.com"
         #have to use _request so we don't add api_base to the url
         result =  self._request("post", url, auth=(self._app_id, self._app_secret))
         self._token = result["access_token"]
