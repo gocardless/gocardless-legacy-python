@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import urllib
+import urlparse
 
 import gocardless
 import urlbuilder
@@ -255,7 +256,12 @@ class Client(object):
                 "resource_id":params["resource_id"],
                 "resource_type":params["resource_type"]
                 }
-        self.api_post(params["resource_uri"], to_post, auth=(self._app_id, self._app_secret))
+        parse_rs = urlparse.urlparse(params["resource_uri"])
+        if parse_rs.query != '':
+            dest = "{0}?{1}".format(parse_rs.path, parse_rs.query)
+        else:
+            dest = parse_rs.path
+        self.api_post(dest, to_post, auth=(self._app_id, self._app_secret))
         
     def new_merchant_url(self, redirect_uri, state=None):
         """Get a URL for managing a new merchant
