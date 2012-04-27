@@ -256,13 +256,7 @@ class Client(object):
                 "resource_id":params["resource_id"],
                 "resource_type":params["resource_type"]
                 }
-        parse_rs = urlparse.urlparse(params["resource_uri"])
-        path = parse_rs.path.replace("/api/v1", "")
-        if parse_rs.query != '':
-            dest = "{0}?{1}".format(path, parse_rs.query)
-        else:
-            dest = path
-        self.api_post(dest, to_post, auth=(self._app_id, self._app_secret))
+        self.api_post("/confirm", to_post, auth=(self._app_id, self._app_secret))
         
     def new_merchant_url(self, redirect_uri, state=None):
         """Get a URL for managing a new merchant

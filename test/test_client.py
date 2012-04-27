@@ -160,20 +160,9 @@ class ConfirmResourceTestCase(unittest.TestCase):
             expected_auth = (mock_account_details["app_id"],
                 mock_account_details["app_secret"])
             self.client.confirm_resource(self.params)
-            mock_post.assert_called_with(self.resource_path, 
+            expected_path = "/confirm"
+            mock_post.assert_called_with(expected_path, 
                 expected_data, auth=expected_auth)
-
-    def test_resource_post_with_query(self):
-        query = '?key2=value2&key1=value1'
-        self.params["resource_uri"] += query
-        self.params["signature"] = utils.generate_signature(self.params, 
-                mock_account_details["app_secret"])
-        with patch.object(self.client, 'api_post') as mock_post:
-            self.client.confirm_resource(self.params)
-            expected_path = self.resource_path + query
-            mock_post.assert_called_with(expected_path,
-                    mock._ANY(), auth=mock._ANY())
-
 
 class UrlBuilderTestCase(unittest.TestCase):
 
