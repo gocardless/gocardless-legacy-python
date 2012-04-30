@@ -16,6 +16,18 @@ from gocardless.resources import Merchant, Subscription, Bill, PreAuthorization,
 logger = logging.getLogger(__name__)
 
 class Client(object):
+    """The main interface to the GoCardless API
+
+    This class is the starting point for interacting with GoCardless.
+    If you are a merchant than you can obtain a client instance by setting
+    your account details in :py:func:`gocardless.set_details`.
+    
+    If you are a
+    partner and need OAuth access to other merchants' accounts then you need
+    to create a client using your app id and app secret, then use the OAuth
+    APIs to obtain authorization over the merchants' account.
+
+    """
 
     API_PATH = '/api/v1'
 
@@ -36,6 +48,16 @@ class Client(object):
 
     def __init__(self, app_id, app_secret, access_token=None, 
             merchant_id=None):
+        """Create a client
+
+        :param string app_id: Your application id.
+        :param string app_secret: Your app secret.
+        :param string access_token: The access token for this account, this should 
+          be your access token from the developer settings page unless you are
+          trying to manage another merchants' account via OAuth.
+        :param string merchant_id: The merchant id for this account, should be your
+          merchant id unless you are trying to manage another account via OAuth.
+        """
         self._app_id = app_id
         self._app_secret = app_secret
         if access_token:
@@ -102,6 +124,8 @@ class Client(object):
     def user(self, id):
         """
         Find a user by id
+
+        :param id: The users id
         """
         return User.find_with_client(id, self)
 
@@ -109,13 +133,15 @@ class Client(object):
         """
         Find a pre authorization with id `id`
 
-        :params : id - Subscription ID
+        :params id: The pre authorization id
         """
         return PreAuthorization.find_with_client(id, self)
     
     def subscription(self, id):
         """
         Returns a single subscription
+
+        :param id: The subscription id, String
         """
         return Subscription.find_with_client(id, self)
 
@@ -130,9 +156,10 @@ class Client(object):
 
         :param amount: The amount to bill
         :param pre_auth_id: The id of an existing pre_authorization which 
-        has not expire
+          has not expire
         :param name: A name for this bill
         :param description: A description for this bill
+
         """
         return Bill.create_under_preauth(amount, pre_auth_id, self, 
                 name=name, description=description)
@@ -146,29 +173,30 @@ class Client(object):
 
         :param amount: The amount to charge each time
         :param interval_length: The length of time between each charge, this
-        is an integer, the units are specified by interval_unit.
+          is an integer, the units are specified by interval_unit.
         :param interval_unit: The unit to measure the interval length, must
-        be one of "day' or "week"
-        :param name: The name to give the suvscription
+          be one of "day' or "week"
+        :param name: The name to give the subscription
         :param description: The description of the subscription
         :param interval_count: The Calculates expires_at based on the number
-        of intervals you would like to collect. If both interval_count and
-        expires_at are specified the expires_at parameter will take 
-        precedence 
+          of intervals you would like to collect. If both interval_count and
+          expires_at are specified the expires_at parameter will take 
+          precedence 
         :param expires_at: When the subscription expires, should be a datetime
-        object.
+          object.
         :param starts_at: When the subscription starts, should be a datetime
-        object
+          object
         :param redirect_uri: URI to redirect to after the authorization process
         :param cancel_uri: URI to redirect the user to if they cancel
-        authorization
+          authorization
         :param state: String which will be passed to the merchant on
-        redirect.
+          redirect.
         :param user: A dictionary which will be used to prepopulate the sign
-        up form the user sees, this can contain keys:
-        - `first_name`
-        - `last_name`
-        - `email`
+          up form the user sees, this can contain keys:
+
+          - `first_name`
+          - `last_name`
+          - `email`
 
         """
         params = urlbuilder.SubscriptionParams(amount, self._merchant_id, 
@@ -190,14 +218,15 @@ class Client(object):
         :param description: The description of the bill
         :param redirect_uri: URI to redirect to after the authorization process
         :param cancel_uri: URI to redirect the user to if they cancel
-        authorization
+          authorization
         :param state: String which will be passed to the merchant on
-        redirect.
+          redirect.
         :param user: A dictionary which will be used to prepopulate the sign
-        up form the user sees, this can contain keys:
-        - `first_name`
-        - `last_name`
-        - `email`
+          up form the user sees, this can contain keys:
+
+          - `first_name`
+          - `last_name`
+          - `email`
 
 
         """
@@ -214,34 +243,36 @@ class Client(object):
         """Get a url for creating new pre_authorizations
 
         :param max_amount: A float which is the maximum amount for this
-        pre_authorization
+          pre_authorization
         :param interval_length: The length of this pre_authorization
         :param interval_unit: The units in which the interval_length
-        is measured, must be one of
-        - "day"
-        - "month"
+          is measured, must be one of
+          - "day"
+          - "month"
         :param expires_at: The date that this pre_authorization will
-        expire, must be a datetime object which is in the future.
+          expire, must be a datetime object which is in the future.
         :param name: A short string which is the name of the pre_authorization
         :param description: A longer string describing what the 
-        pre_authorization is for.
+          pre_authorization is for.
         :param interval_count: calculates expires_at based on the number of
-        payment intervals you would like the resource to have. Must be a
-        positive integer greater than 0. If you specify both an interval_count
-        and an expires_at argument then the expires_at argument will take
-        precedence.
+          payment intervals you would like the resource to have. Must be a
+          positive integer greater than 0. If you specify both an interval_count
+          and an expires_at argument then the expires_at argument will take
+          precedence.
         :param calendar_intervals: Describes whether the interval resource
-        should be aligned with calendar weeks or months, default is False
+          should be aligned with calendar weeks or months, default is False
         :param redirect_uri: URI to redirect to after the authorization process
         :param cancel_uri: URI to redirect the user to if they cancel
-        authorization
+          authorization
         :param state: String which will be passed to the merchant on
-        redirect.
+          redirect.
         :param user: A dictionary which will be used to prepopulate the sign
-        up form the user sees, this can contain keys:
-        - `first_name`
-        - `last_name`
-        - `email`
+          up form the user sees, this can contain keys:
+
+          - `first_name`
+          - `last_name`
+          - `email`
+
         """
         params = urlbuilder.PreAuthorizationParams(max_amount, 
                 self._merchant_id, interval_length, interval_unit, 
@@ -282,22 +313,26 @@ class Client(object):
         This method creates a URL which partners should redirect
         merchants to in order to obtain permission to manage their GoCardless
         payments.
+
         :param redirect_uri: The URI where the merchant will be sent after
-        authorizing.
+          authorizing.
         :param state: An optional string which will be present in the request
-        to the redirect URI, useful for tracking the user.
+          to the redirect URI, useful for tracking the user.
         :param merchant: A dictionary which will be used to prepopulate the
-        merchant sign up page, can contain any of the keys:
-        - "name"
-        - "billing_address_1"
-        - "billing_address_2"
-        - "billing_town"
-        - "billing_county"
-        - "billing_postcode"
-        - "user" which can be a dictionary containing the keys:
-          - "first_name"
-          - "last_name"
-          - "email"
+          merchant sign up page, can contain any of the keys:
+
+          - "name"
+          - "billing_address_1"
+          - "billing_address_2"
+          - "billing_town"
+          - "billing_county"
+          - "billing_postcode"
+          - "user" which can be a dictionary containing the keys:
+
+            - "first_name"
+            - "last_name"
+            - "email"
+
         """
         params = {
                 "client_id":self._app_id,
@@ -322,9 +357,10 @@ class Client(object):
         on behalf of the merchant.
 
         :param redirect_uri: The redirect_uri used in the request which 
-        obtained the authorization code, must match exactly.
+          obtained the authorization code, must match exactly.
         :param authorization_code: The authorization code obtained in the
-        previous part of the process.
+          previous part of the process.
+
         """
         params = {
                 "client_id":self._app_id,

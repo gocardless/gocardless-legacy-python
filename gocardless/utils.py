@@ -4,9 +4,11 @@ import hmac
 import re
 
 def percent_encode(string):
+    """A version of urllibs' quote which correctly quotes '~'"""
     return urllib.quote(string.encode('utf-8'), '~')
 
 def to_query(obj, ns=None):
+    """Create a query string from a list or dictionary"""
     if isinstance(obj, dict):
         pairs = sum((to_query(v, u"{0}[{1}]".format(ns, k) if ns else k)
                      for k, v in obj.items()), [])
