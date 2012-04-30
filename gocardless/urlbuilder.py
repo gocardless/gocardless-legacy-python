@@ -48,7 +48,7 @@ class UrlBuilder(object):
 
 class BasicParams(object):
 
-    def __init__(self, amount, merchant_id, name=None, description=None):
+    def __init__(self, amount, merchant_id, name=None, description=None, user=None):
         if not amount > 0:
             raise ValueError("amount must be positive, value passed was"
                     " {0}".format(amount))
@@ -58,9 +58,12 @@ class BasicParams(object):
         if name:
             self.name = name
 
+        if user:
+            self.user = user
+
         if description:
             self.description = description
-        self.attrnames = ["amount", "name", "description", "merchant_id"]
+        self.attrnames = ["amount", "name", "description", "merchant_id", "user"]
 
     def to_dict(self):
         result = {}
@@ -75,10 +78,13 @@ class PreAuthorizationParams(object):
     
     def __init__(self,max_amount, merchant_id, interval_length,\
             interval_unit, expires_at=None, name=None, description=None,\
-            interval_count=None, calendar_intervals=None):
+            interval_count=None, calendar_intervals=None, user=None):
 
         self.merchant_id = merchant_id
         self.resource_name = "pre_authorizations"
+
+        if user:
+            self.user = user
 
         if not max_amount > 0:
             raise ValueError("""max_amount must be
@@ -119,10 +125,10 @@ class PreAuthorizationParams(object):
 
     def to_dict(self):
         result = {}
-        attrnames = ["merchant_id", "name", "description", \
-                "interval_count", "interval_unit", "interval_length", \
-                "max_amount", "calendar_intervals", "expires_at", \
-                ]
+        attrnames = ["merchant_id", "name", "description", 
+                "interval_count", "interval_unit", "interval_length", 
+                "max_amount", "calendar_intervals", "expires_at",
+                "user"]
         for attrname in attrnames:
             val = getattr(self, attrname, None)
             if val:
@@ -132,8 +138,9 @@ class PreAuthorizationParams(object):
 
 class BillParams(BasicParams):
     
-    def __init__(self, amount, merchant_id, name=None, description=None):
-        BasicParams.__init__(self, amount, merchant_id, name=name, description=description)
+    def __init__(self, amount, merchant_id, name=None, description=None, user=None):
+        BasicParams.__init__(self, amount, merchant_id, name=name, 
+                user=user, description=description)
         self.resource_name  = "bills"
 
 
@@ -142,8 +149,9 @@ class SubscriptionParams(BasicParams):
 
     def __init__(self, amount, merchant_id, interval_length, interval_unit,
             name=None, description=None,start_at=None, expires_at=None, 
-            interval_count=None):
-        BasicParams.__init__(self, amount, merchant_id, description=description, name=name)
+            interval_count=None, user=None):
+        BasicParams.__init__(self, amount, merchant_id, 
+                user=user, description=description, name=name)
         self.resource_name = "subscriptions"
         self.merchant_id = merchant_id
 

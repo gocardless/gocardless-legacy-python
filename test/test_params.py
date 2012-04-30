@@ -195,6 +195,28 @@ class SubscriptionParamsTestCase(ExpiringLimitTestCase, unittest.TestCase):
         self.assertEqual(expected, par.to_dict())
 
 
+class PrepopDataTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.mock_prepop = {"first_name": "Tom",
+                "last_name": "Blomfield",
+                "email": "tom@gocardless.com"
+                }
+
+    def assert_prepop(self, params):
+        self.assertEqual(params.to_dict()["user"], self.mock_prepop)
+
+    def test_bill_params(self):
+        params = urlbuilder.BillParams(10, "amerchid", user=self.mock_prepop)
+        self.assert_prepop(params)
+
+    def test_sub_params(self):
+        params = urlbuilder.SubscriptionParams(10, "merchid", 3, "day", user=self.mock_prepop)
+        self.assert_prepop(params)
+
+    def test_pre_auth_params(self):
+        params = urlbuilder.PreAuthorizationParams(10, "amerchid", 5, "day", user=self.mock_prepop)
+        self.assert_prepop(params)
 
 
 

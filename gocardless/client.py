@@ -140,7 +140,8 @@ class Client(object):
 
     def new_subscription_url(self, amount, interval_length, interval_unit, 
             name=None, description=None, interval_count=None, start_at=None,
-            expires_at=None, redirect_uri=None, cancel_uri=None, state=None):
+            expires_at=None, redirect_uri=None, cancel_uri=None, state=None,
+            user=None):
         """Generate a url for creating a new subscription
 
         :param amount: The amount to charge each time
@@ -163,18 +164,25 @@ class Client(object):
         authorization
         :param state: String which will be passed to the merchant on
         redirect.
+        :param user: A dictionary which will be used to prepopulate the sign
+        up form the user sees, this can contain keys:
+        - `first_name`
+        - `last_name`
+        - `email`
+
         """
         params = urlbuilder.SubscriptionParams(amount, self._merchant_id, 
                 interval_length, interval_unit, name=name, 
                 description=description, interval_count=interval_count, 
-                expires_at=expires_at, start_at=start_at)
+                expires_at=expires_at, start_at=start_at, user=user)
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri, 
                 cancel_uri=cancel_uri, state=state)
 
         
     def new_bill_url(self, amount, name=None, description=None,
-            redirect_uri=None, cancel_uri=None, state=None):
+            redirect_uri=None, cancel_uri=None, state=None,
+            user=None):
         """Generate a url for creating a new bill
 
         :param amount: The amount to bill the customer
@@ -185,10 +193,16 @@ class Client(object):
         authorization
         :param state: String which will be passed to the merchant on
         redirect.
+        :param user: A dictionary which will be used to prepopulate the sign
+        up form the user sees, this can contain keys:
+        - `first_name`
+        - `last_name`
+        - `email`
+
 
         """
         params = urlbuilder.BillParams(amount, self._merchant_id, name=name, 
-                description=description)
+                description=description, user=user)
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri, 
                 cancel_uri=cancel_uri, state=state)
@@ -196,7 +210,7 @@ class Client(object):
     def new_preauthorization_url(self,max_amount, interval_length,\
             interval_unit, expires_at=None, name=None, description=None,\
             interval_count=None, calendar_intervals=None,
-            redirect_uri=None, cancel_uri=None, state=None):
+            redirect_uri=None, cancel_uri=None, state=None, user=None):
         """Get a url for creating new pre_authorizations
 
         :param max_amount: A float which is the maximum amount for this
@@ -223,12 +237,16 @@ class Client(object):
         authorization
         :param state: String which will be passed to the merchant on
         redirect.
-
+        :param user: A dictionary which will be used to prepopulate the sign
+        up form the user sees, this can contain keys:
+        - `first_name`
+        - `last_name`
+        - `email`
         """
         params = urlbuilder.PreAuthorizationParams(max_amount, 
                 self._merchant_id, interval_length, interval_unit, 
                 expires_at=expires_at, name=name, description=description, 
-                interval_count=interval_count, 
+                interval_count=interval_count,  user=user,
                 calendar_intervals=calendar_intervals)
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri, 
@@ -258,7 +276,7 @@ class Client(object):
                 }
         self.api_post("/confirm", to_post, auth=(self._app_id, self._app_secret))
         
-    def new_merchant_url(self, redirect_uri, state=None):
+    def new_merchant_url(self, redirect_uri, state=None, merchant=None):
         """Get a URL for managing a new merchant
 
         This method creates a URL which partners should redirect
@@ -268,6 +286,18 @@ class Client(object):
         authorizing.
         :param state: An optional string which will be present in the request
         to the redirect URI, useful for tracking the user.
+        :param merchant: A dictionary which will be used to prepopulate the
+        merchant sign up page, can contain any of the keys:
+        - "name"
+        - "billing_address_1"
+        - "billing_address_2"
+        - "billing_town"
+        - "billing_county"
+        - "billing_postcode"
+        - "user" which can be a dictionary containing the keys:
+          - "first_name"
+          - "last_name"
+          - "email"
         """
         params = {
                 "client_id":self._app_id,
@@ -277,6 +307,8 @@ class Client(object):
                 }
         if state:
             params["state"] = state
+        if merchant:
+            params["merchant"] = merchant
         return "{0}/oauth/authorize?{1}".format(self.get_base_url(),
                 to_query(params))
 

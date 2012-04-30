@@ -51,6 +51,9 @@ class ClientTestCase(unittest.TestCase):
                 " was anerrormessage")
 
     def test_error_when_result_is_list(self):
+        #Test for an issue where the code which checked if
+        #the response was an error failed because it did
+        #not first check if the response was a dictionary.
         with patch('gocardless.clientlib.Request') as mock_req_mod:
             mock_request = mock.Mock()
             mock_request.perform.return_value = ["one", "two"]
@@ -166,6 +169,7 @@ class ConfirmResourceTestCase(unittest.TestCase):
             mock_post.assert_called_with(expected_path, 
                 expected_data, auth=expected_auth)
 
+
 class UrlBuilderTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -272,6 +276,7 @@ class UrlBuilderTestCase(unittest.TestCase):
             self.assertEqual(urlparams["timestamp"], testdate.isoformat()[:-7] + "Z")
 
     def test_other_timezones_use_UTC(self):
+        #set system time to a timezone which is different to UTC
         if "TZ" in os.environ:
             oldtime = os.environ["TZ"]
         else:
@@ -282,8 +287,13 @@ class UrlBuilderTestCase(unittest.TestCase):
         url = self.urlbuilder.build_and_sign(params)
         urlparams = get_url_params(url)
         timestamp = datetime.datetime.strptime(urlparams["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
-        del os.environ["TZ"]
+        #restore timezone
+        if oldtime:
+            os.environ["TZ"] = oldtime
+        else:
+            del os.environ["TZ"]
         time.tzset()
+        #check that time is reasonably close to now.
         self.assertTrue(abs((datetime.datetime.utcnow() - timestamp).
             total_seconds()) < 100)
 
@@ -308,7 +318,25 @@ class MerchantUrlTestCase(unittest.TestCase):
                 "response_type":"code"
                 }
         self.assertEqual(expected, params)
-
+    
+    def test_merchant_url_with_merchant_prepop(self):
+        merchant = {
+                "name":"merchname",
+                "billing_address_1":"myadd1",
+                "billing_address_2":"myadd2",
+                "billing_town":"smalltown",
+                "billing_county":"godknows",
+                "billing_postcode":"PSTCDE",
+                "user":{
+                    "first_name":"nameone",
+                    "last_name":"nametwo",
+                    "email":"email@email.com"
+                    }
+                }
+        url = self.client.new_merchant_url("http://someutl/somepath", merchant=merchant)
+        params = get_url_params(url)
+        self.assertEqual(params["merchant[name]"], "merchname")
+        self.assertEqual(params["merchant[user][first_name]"], "nameone")
     
     def test_merchant_url_state(self):
         url = self.client.new_merchant_url("http://someurl", state="thestate")
@@ -373,20 +401,53 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
             mock_inst.build_and_sign.assert_called_with(matcher,
                     cancel_uri=None, redirect_uri=None, state=None)
     
+    def params_argument_check(self, method, params_class, *args, **kwargs):
+        with patch('gocardless.urlbuilder.UrlBuilder') as mock_builder:
+            with patch('gocardless.urlbuilder.{0}'.format(params_class.__name__)) as mock_class:
+                c = create_mock_client(mock_account_details)
+                getattr(c, method)(*args, **kwargs)
+                arg1 = args[0]
+                rest = args[1:]
+                mock_class.assert_called_with(arg1, 
+                        mock_account_details["merchant_id"], *rest,
+                        **kwargs)
+    
     def test_new_preauth_calls_urlbuilder(self):
         self.urlbuilder_argument_check("new_preauthorization_url", 
                 urlbuilder.PreAuthorizationParams,
                 3, 7, "day")
+
+    def test_new_preauth_params_constructor(self):
+        self.params_argument_check("new_preauthorization_url",
+                urlbuilder.PreAuthorizationParams,
+                3, 7, "day", expires_at=datetime.datetime.now(),
+                name="aname", description="desc", interval_count=5,
+                calendar_intervals=False, user={"somekey":"somval"})
         
     def test_new_bill_calls_urlbuilder(self):
         self.urlbuilder_argument_check("new_bill_url",
                 urlbuilder.BillParams,
                 4)
 
+    def test_new_bill_params_constructor(self):
+        self.params_argument_check("new_bill_url",
+                urlbuilder.BillParams,
+                10, name="aname", user={"key":"val"},
+                description="adesc")
+
     def test_new_subscription_calls_urlbuilder(self):
         self.urlbuilder_argument_check("new_subscription_url",
                 urlbuilder.SubscriptionParams,
                 10, 10, "day")
+
+    def test_new_sub_params_constructor(self):
+        self.params_argument_check("new_subscription_url",
+                urlbuilder.SubscriptionParams, 
+                10, 23, "day", name="name", description="adesc", 
+                start_at=datetime.datetime.now(),
+                expires_at=datetime.datetime.now() + datetime.timedelta(100),
+                interval_count=20, user={"key":"val"})
+
 
 
 
