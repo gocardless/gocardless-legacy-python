@@ -5,12 +5,29 @@ import urlparse
 import utils
 
 class UrlBuilder(object):
+    """Handles correctly encoding and signing api urls"""
 
     def __init__(self, client):
+        """Create a new UrlBuilder
+
+        :param client: an instance of `gocardless.Client` which will
+        be used to sign urls.
+        """
         self.client = client
 
     def build_and_sign(self, params, state=None, redirect_uri=None, 
             cancel_uri=None):
+        """Builds a url and returns it as a string
+
+        :param params: A Params class corresponding to the resource for which
+        you wish to create a url. For example, to create a Subscription url
+        pass an instance of SubscriptionParams.
+        :param state: The state argument to be encoded in the query string.
+        :param redirect_uri: The redirect uri the user will be sent to after
+        the resource has been created.
+        :param cancel_uri: The uri the user will be redirected to if they
+        cancel the resource creation
+        """
         param_dict = {}
         param_dict[utils.singularize(params.resource_name)] = params.to_dict().copy()
         if state:
@@ -20,7 +37,7 @@ class UrlBuilder(object):
         if cancel_uri:
             param_dict["cancel_uri"] = cancel_uri
         param_dict["client_id"] = self.client._app_id        
-        param_dict["timestamp"] = datetime.datetime.now().isoformat()[:-7] + "Z"
+        param_dict["timestamp"] = datetime.datetime.utcnow().isoformat()[:-7] + "Z"
         param_dict["nonce"] = base64.b64encode(os.urandom(40))
 
         signature = utils.generate_signature(param_dict, self.client._app_secret)

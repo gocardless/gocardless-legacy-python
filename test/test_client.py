@@ -4,7 +4,9 @@ import json
 import unittest
 import mock
 from mock import patch
+import os
 import sys
+import time
 import urlparse
 
 import fixtures
@@ -263,11 +265,27 @@ class UrlBuilderTestCase(unittest.TestCase):
     def test_url_contains_timestamp(self):
         testdate = datetime.datetime.strptime("2010-01-01:0800", "%Y-%m-%d:%H%M")
         with patch('datetime.datetime'):
-            datetime.datetime.now.return_value = testdate
+            datetime.datetime.utcnow.return_value = testdate
             params = self.make_mock_params({"somekey":"somval"})
             url = self.urlbuilder.build_and_sign(params)
             urlparams = get_url_params(url)
             self.assertEqual(urlparams["timestamp"], testdate.isoformat()[:-7] + "Z")
+
+    def test_other_timezones_use_UTC(self):
+        if "TZ" in os.environ:
+            oldtime = os.environ["TZ"]
+        else:
+            oldtime = None
+        os.environ["TZ"] = "US/Eastern"
+        time.tzset()
+        params = self.make_mock_params({})
+        url = self.urlbuilder.build_and_sign(params)
+        urlparams = get_url_params(url)
+        timestamp = datetime.datetime.strptime(urlparams["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
+        del os.environ["TZ"]
+        time.tzset()
+        self.assertTrue(abs((datetime.datetime.utcnow() - timestamp).
+            total_seconds()) < 100)
 
 class MerchantUrlTestCase(unittest.TestCase):
     def setUp(self):
