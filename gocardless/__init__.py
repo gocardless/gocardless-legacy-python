@@ -25,6 +25,7 @@ from .client import Client
 
 #import as clientlib so that we don't shadow with the client variable
 import client as clientlib
+from gocardless.resources import Bill, Subscription, PreAuthorization, User, Merchant
 
 environment = 'production'
 """The environment GoCardless executes API requests against, should be
