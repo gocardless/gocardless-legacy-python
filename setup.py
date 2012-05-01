@@ -1,13 +1,43 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
+import os
+
+DESCRIPTION = "The Python client library for the GoCardless API"
+
+LONG_DESCRIPTION = None
+try:
+    LONG_DESCRIPTION = open('README.rst').read()
+except:
+    pass
+
+# Dirty hack to get version number from __init__.py - we can't import it as it
+# depends on requests and requests isn't installed until this file is read
+init = os.path.join(os.path.dirname(__file__), 'gocardless', '__init__.py')
+version_line = filter(lambda l: l.startswith('VERSION'), open(init))[0]
+version = '.'.join(str(p) for p in eval(version_line.split('=')[-1]))
+print version
+
+CLASSIFIERS = [
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+]
 
 setup(
-        name="gocardless",
-        version="0.1.0",
-        author="Alex Good",
-        author_email="alex@gocardless.com",
-        url="http://gocardless.com",
-        description="Python client library for GoCardless",
-        packages=["gocardless"],
-        requires=["requests"]
-        )
-
+    name='gocardless',
+    version=VERSION,
+    packages=find_packages(),
+    author='GoCardless',
+    author_email='developers@{nospam}gocardless.com',
+    url='https://gocardless.com/docs/python/merchant_client_guide',
+    license='MIT',
+    include_package_data=True,
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    platforms=['any'],
+    classifiers=CLASSIFIERS,
+    install_requires=['requests'],
+    test_suite='tests',
+)
