@@ -14,7 +14,6 @@ except:
 init = os.path.join(os.path.dirname(__file__), 'gocardless', '__init__.py')
 version_line = filter(lambda l: l.startswith('VERSION'), open(init))[0]
 version = '.'.join(str(p) for p in eval(version_line.split('=')[-1]))
-print version
 
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
@@ -27,7 +26,7 @@ CLASSIFIERS = [
 
 setup(
     name='gocardless',
-    version=VERSION,
+    version=version,
     packages=find_packages(),
     author='GoCardless',
     author_email='developers@{nospam}gocardless.com',
