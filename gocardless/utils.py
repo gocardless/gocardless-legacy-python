@@ -28,6 +28,12 @@ def generate_signature(data, secret):
     """
     return hmac.new(secret, to_query(data), hashlib.sha256).hexdigest()
 
+def signature_valid(data, secret):
+    params = data.copy()
+    sig = params.pop("signature")
+    valid_sig = generate_signature(params, secret)
+    return sig == valid_sig
+
 def camelize(to_uncamel):
     result = []
     for word in re.split("_", to_uncamel):

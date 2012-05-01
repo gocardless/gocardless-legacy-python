@@ -50,6 +50,14 @@ class SignatureTestCase(unittest.TestCase):
       # works correctly
       sig = utils.generate_signature({"foo": "bar", "example": [1, "a"]},self.secret)
       self.assertEqual(sig, '5a9447aef2ebd0e12d80d80c836858c6f9c13219f615ef5d135da408bcad453d')
+
+    def test_validate_signature(self):
+        params = {"key1":"val1", "key2":"val2"}
+        sig = utils.generate_signature(params, self.secret)
+        params["signature"] = sig
+        self.assertTrue(utils.signature_valid(params, self.secret))
+        params["signature"] = "123482494523435"
+        self.assertFalse(utils.signature_valid(params, self.secret))
     
 
 class CamelizeTestCase(unittest.TestCase):

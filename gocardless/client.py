@@ -378,3 +378,15 @@ class Client(object):
         self._merchant_id = result["scope"].split(":")[1]
         return self._access_token
 
+    def validate_webhook(self, params):
+        """Check whether a webhook signature is valid
+        
+        Takes a dictionary of parameters, including the signature
+        and returns a boolean indicating whether the signature is 
+        valid.
+
+        :param params: A dictionary of data to validate, must include
+        the key "signature"
+        """
+        utils.signature_valid(params, self._app_secret)
+
