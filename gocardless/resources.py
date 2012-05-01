@@ -20,17 +20,40 @@ class ResourceMetaClass(type):
         return type.__new__(meta, name, bases, attrs)
 
 class Resource(object):
+    """A GoCardless resource
+
+    Subclasses of `Resource` define class attributes to specify how
+    the resource is fetched and represented.
+
+    The class attribute `endpoint` is the path to the resource on the server.
+
+    The class attribute `date_fields` names fields which will be converted 
+    into `datetime.datetime` objects on construction.
+
+    The class attribute `reference_fields` names fields which are uris to other
+    resources and will be converted into functions which can be called to 
+    retrieve those resources.
+    """
     __metaclass__ = ResourceMetaClass
 
     date_fields = ["created_at"]
     reference_fields = []
 
     def __init__(self, in_attrs, client):
+        """Construct a resource 
+
+        :param in_attrs: A dictionary of attributes, usually obtained from a 
+        JSON response. 
+        :param client: an instance of gocardless.Client
+        """
         attrs = in_attrs.copy()
         self._raw_attrs = attrs.copy()
         self.id = attrs["id"]
         self.client = client
         if "sub_resource_uris" in attrs:
+            #For each subresource_uri create a method which grabs data
+            #from the URI and uses it to instantiate the relevant class
+            #and return it.
             for name, uri in attrs.pop("sub_resource_uris").items():
                 path = re.sub(".*/api/v1", "", uri)
                 sub_klass = self._get_klass_from_name(name)

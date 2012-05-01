@@ -1,3 +1,4 @@
+import gocardless
 import json
 import requests
 
@@ -7,7 +8,10 @@ class Request(object):
     def __init__(self, method, url):
         self._method = method
         self._url = url
-        self._opts = {'headers': {'Accept': 'application/json'}}
+        headers = {}
+        headers["Accept"] = "application/json"
+        headers["User-Agent"] = "gocardless-python/{0}".format(gocardless.get_version())
+        self._opts = {"headers" : headers }
 
         if not self._valid_method(method):
             raise ValueError('Invalid method {}'.format(method))
