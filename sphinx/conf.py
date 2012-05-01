@@ -43,7 +43,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'GoCardless Python Library'
-copyright = u'2012, Alex Good'
+copyright = u'2012, GoCardless'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -186,7 +186,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'GoCardlessPythonLibrary.tex', u'GoCardless Python Library Documentation',
-   u'Alex Good', 'manual'),
+   u'GoCardless', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -216,7 +216,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'gocardlesspythonlibrary', u'GoCardless Python Library Documentation',
-     [u'Alex Good'], 1)
+     [u'GoCardless'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -230,7 +230,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'GoCardlessPythonLibrary', u'GoCardless Python Library Documentation',
-   u'Alex Good', 'GoCardlessPythonLibrary', 'One line description of project.',
+   u'GoCardless', 'GoCardlessPythonLibrary', 'One line description of project.',
    'Miscellaneous'),
 ]
 
