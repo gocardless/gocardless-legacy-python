@@ -38,5 +38,5 @@ setup(
     platforms=['any'],
     classifiers=CLASSIFIERS,
     install_requires=['requests'],
-    test_suite='tests',
+    test_suite='test',
 )
