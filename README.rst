@@ -16,10 +16,10 @@ the `gocardless.environment` to "sandbox".::
 Set your account details:::
     
     >>> details = {
-    >>>     "app_id":"kzCOPw2JtJvRQxKTlFqQTGvxLvkoMS1Eb0Dgl5QVc1W0NKpOEZDvESfGOI_kkG2l",
-    >>>     "app_secret":"IO9AlgPsbYNCtFlciV_HOBrGB3Mi07PFYSn2zx4uK5xaWJI1AzwnYeC86x46ji_g",
-    >>>     "token":"5EFkzOrUOZ8t+iaP86NggIy+iKGJ0f7QMnMd+Q3P4mQk17Kzq9G1vYrNlEWFldlg",
-    >>>     "merchant_id":"5EFkzOrUOZ8t+iaP86NggIy+iKGJ0f7QMnMd+Q3P4mQk17Kzq9G1vYrNlEWFldlg"
+    >>>     "app_id":"kzCOPw2JtJvRQxKOPEREQTGvxLvkoMS1Eb0Dgl5QVc1W0NKpOEZDvESfGOI_kkG2l",
+    >>>     "app_secret":"IO9AlgPsbYNCtFlcOFGROBrGB3Mi07PFYSn2zx4uK5xaWJI1AzwnYeC86x46ji_g",
+    >>>     "token":"5EFkzOrUOZ8t+iaP86NggIy+FOFSD0f7QMnMd+Q3P4mQk17Kzq9G1vYrNlEWFldlg",
+    >>>     "merchant_id":"02FX1YFDAS"
     >>> }
     >>> gocardless.set_details(details)
 
