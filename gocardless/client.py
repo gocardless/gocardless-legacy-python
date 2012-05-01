@@ -386,7 +386,7 @@ class Client(object):
         valid.
 
         :param params: A dictionary of data to validate, must include
-        the key "signature"
+          the key "signature"
         """
         utils.signature_valid(params, self._app_secret)
 
