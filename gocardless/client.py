@@ -175,7 +175,7 @@ class Client(object):
         :param interval_length: The length of time between each charge, this
           is an integer, the units are specified by interval_unit.
         :param interval_unit: The unit to measure the interval length, must
-          be one of "day' or "week"
+          be one of "day", "week" or "month"
         :param name: The name to give the subscription
         :param description: The description of the subscription
         :param interval_count: The Calculates expires_at based on the number
@@ -248,6 +248,7 @@ class Client(object):
         :param interval_unit: The units in which the interval_length
           is measured, must be one of
           - "day"
+          - "week"
           - "month"
         :param expires_at: The date that this pre_authorization will
           expire, must be a datetime object which is in the future.

@@ -15,7 +15,8 @@ class ExpiringLimitTestCase(object):
             pars = self.create_params(10, "1123210", -1, "day")
  
     def test_interval_unit_is_valid(self):
-        pars = self.create_params(10, 10, "11235432", "day")
+        for interval_unit in ["day", "week", "month"]:
+            pars = self.create_params(10, 10, "11235432", interval_unit)
         with self.assertRaises(ValueError):
             pars = self.create_params(10, 10, "1432233123", "invalid")
 
@@ -60,7 +61,7 @@ class PreAuthParamsTestCase(ExpiringLimitTestCase, unittest.TestCase):
                 urlbuilder.PreAuthorizationParams, 12, "!2343", -3, "month")
 
     def test_interval_unit_is_one_of_accepted(self):
-        for unit_type in ["month", "day"]:
+        for unit_type in ["month", "day", "week"]:
             pa = urlbuilder.PreAuthorizationParams(12, "1234", 3, unit_type)
         self.assertRaises(ValueError, \
                 urlbuilder.PreAuthorizationParams, 21,"1234", 4, "soem other unit")

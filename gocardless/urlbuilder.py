@@ -96,7 +96,7 @@ class PreAuthorizationParams(object):
                     "passed was {0}".format(interval_length))
         self.interval_length = interval_length
 
-        valid_units = ["month", "day"]
+        valid_units = ["month", "day", "week"]
         if interval_unit not in valid_units:
             raise ValueError("interval_unit must be one of {0},"
                     "value passed was {1}".format(valid_units, interval_unit))
@@ -160,7 +160,7 @@ class SubscriptionParams(BasicParams):
                     "passed was {0}".format(interval_length))
         self.interval_length = interval_length
 
-        valid_units = ["month", "day"]
+        valid_units = ["month", "day", "week"]
         if interval_unit not in valid_units:
             raise ValueError("interval_unit must be one of {0},"
                     "value passed was {1}".format(valid_units, interval_unit))
