@@ -1,7 +1,6 @@
 import base64
 import datetime
 import os
-import urlparse
 import utils
 
 class UrlBuilder(object):

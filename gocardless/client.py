@@ -1,14 +1,9 @@
 import base64
-import datetime
-import json
 import logging
-import os
-import urllib
-import urlparse
 
 import gocardless
 import urlbuilder
-from gocardless.utils import generate_signature, to_query
+from gocardless.utils import generate_signature, to_query, signature_valid
 from gocardless.request import Request
 from gocardless.exceptions import ClientError, SignatureError
 from gocardless.resources import Merchant, Subscription, Bill, PreAuthorization, User
@@ -389,5 +384,5 @@ class Client(object):
         :param params: A dictionary of data to validate, must include
           the key "signature"
         """
-        utils.signature_valid(params, self._app_secret)
+        signature_valid(params, self._app_secret)
 

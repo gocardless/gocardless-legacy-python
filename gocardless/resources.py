@@ -1,6 +1,4 @@
 import datetime
-import json
-import logging
 import re
 import sys
 import types
@@ -18,6 +16,7 @@ class ResourceMetaClass(type):
             if hasattr(base, "date_fields") and "date_fields" in attrs:
                 attrs["date_fields"].extend(base.date_fields)
         return type.__new__(meta, name, bases, attrs)
+
 
 class Resource(object):
     """A GoCardless resource
@@ -123,10 +122,10 @@ class Resource(object):
         return cls.find_with_client(id, gocardless.client)
 
 
-
 class Merchant(Resource):
     endpoint = "/merchants/:id"
     date_fields = ["next_payout_date"]
+
 
 class Subscription(Resource):
     endpoint = "/subscriptions/:id"
@@ -146,6 +145,7 @@ class PreAuthorization(Resource):
     def create_bill(self, amount, name=None, description=None):
         return Bill.create_under_preauth(amount, self.id, self.client,
                 name=name, description=description)
+
 
 class Bill(Resource):
     endpoint = "/bills/:id"
