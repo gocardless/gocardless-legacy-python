@@ -37,3 +37,21 @@ active resource style API. For example, to get all of a merchants bills::
     >>> merchant.bills()
     >>> [<gocardless.resources.Bill at 0x29a6050>]
 
+Contribute
+==========
+
+Fork the repo then clone it to your machine and install in "develop" mode
+(preferably using a virtualenv)::
+
+    mkvirtualenv gocardless
+    git clone https://github.com/<username>/gocardless-python
+    cd gocardless-python
+    python setup.py develop
+
+Install the testing dependencies::
+
+    pip install -r requirements.txt
+
+and run the test suite::
+
+    nosetests

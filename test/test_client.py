@@ -83,10 +83,10 @@ class ClientTestCase(unittest.TestCase):
             self.assertEqual(merchant.id, self.account_details["merchant_id"])
 
     def test_get_subscription(self):
-        self.get_resource_tester("subscription", fixtures.subscription_json)
+        self._get_resource_tester("subscription", fixtures.subscription_json)
 
     def test_get_user(self):
-        self.get_resource_tester("user", create_mock_attrs({}))
+        self._get_resource_tester("user", create_mock_attrs({}))
 
     def test_get_pre_authorization(self):
         mock_date = datetime.datetime.now().isoformat()[:-7] + "Z"
@@ -95,15 +95,15 @@ class ClientTestCase(unittest.TestCase):
                 "expires_at":mock_date,
                 "next_interval_start":mock_date
                 }
-        self.get_resource_tester("pre_authorization", 
+        self._get_resource_tester("pre_authorization", 
                 create_mock_attrs(mock_attrs))
 
     def test_get_bill(self):
-        self.get_resource_tester("bill", create_mock_attrs(
+        self._get_resource_tester("bill", create_mock_attrs(
                 {"paid_at":datetime.datetime.now().isoformat()[:-7] + "Z",
                 "user_id":"someuserid"}))
 
-    def get_resource_tester(self, resource_name, resource_fixture):
+    def _get_resource_tester(self, resource_name, resource_fixture):
         expected_klass = getattr(sys.modules["gocardless.resources"], utils.camelize(resource_name))
         with patch.object(self.client, 'api_get'):
             self.client.api_get.return_value = resource_fixture
