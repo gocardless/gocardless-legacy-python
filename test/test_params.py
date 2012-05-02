@@ -20,7 +20,7 @@ class ExpiringLimitTestCase(object):
         with self.assertRaises(ValueError):
             pars = self.create_params(10, 10, "1432233123", "invalid")
 
-    def future_date_tester(self, argname):
+    def _future_date_tester(self, argname):
         invalid_date = datetime.datetime.now() - datetime.timedelta(100)
         valid_date = datetime.datetime.now() + datetime.timedelta(2000)
         par1 = self.create_params(10, 10, "23423421", "day", **{argname:valid_date})
@@ -29,7 +29,7 @@ class ExpiringLimitTestCase(object):
                     **{argname:invalid_date})
 
     def test_expires_at_in_future(self):
-        self.future_date_tester("expires_at")
+        self._future_date_tester("expires_at")
 
     def test_interval_count_positive(self):
         with self.assertRaises(ValueError):
