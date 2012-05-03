@@ -42,12 +42,21 @@ client = None
 :py:func:`gocardless.set_details` has been called.
 """
 
-def set_details(app_id, app_secret, access_token, merchant_id):
+def set_details(app_id=None, app_secret=None, access_token=None, merchant_id=None):
     """Set the global account details to use for requests
 
     The parameters are your security details which can be found
-    on your gocardless developer details page.
+    on your gocardless developer details page. All are mandatory
     """
+    if app_id is None:
+        raise ValueError("app_id is required")
+    if app_secret is None:
+        raise ValueError("app_secret is required")
+    if access_token is None:
+        raise ValueError("access_token is required")
+    if merchant_id is None:
+        raise ValueError("merchant_id is required")
+
     global client
     client = Client(app_id, app_secret, access_token=access_token, 
             merchant_id=merchant_id)

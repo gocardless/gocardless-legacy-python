@@ -15,10 +15,10 @@ the `gocardless.environment` to "sandbox".::
 
 Set your account details:::
     
-    >>> gocardless.set_details("kzCOPw2JtJvRQxKOPEREQTGvxLvkoMS1Eb0Dgl5QVc1W0NKpOEZDvESfGOI_kkG2l", #app_id
-    >>>     "IO9AlgPsbYNCtFlcOFGROBrGB3Mi07PFYSn2zx4uK5xaWJI1AzwnYeC86x46ji_g", #app_secret
-    >>>     "5EFkzOrUOZ8t+iaP86NggIy+FOFSD0f7QMnMd+Q3P4mQk17Kzq9G1vYrNlEWFldlg", #access_token 
-    >>>     "02FX1YFDAS" #merchant_id)
+    >>> gocardless.set_details(app_id="kzCOPw2JtJvRQxKOPEREQTGvxLvkoMS1Eb0Dgl5QVc1W0NKpOEZDvESfGOI_kkG2l",
+    >>>     app_secret="IO9AlgPsbYNCtFlcOFGROBrGB3Mi07PFYSn2zx4uK5xaWJI1AzwnYeC86x46ji_g",
+    >>>     access_token="5EFkzOrUOZ8t+iaP86NggIy+FOFSD0f7QMnMd+Q3P4mQk17Kzq9G1vYrNlEWFldlg",
+    >>>     merchant_id="02FX1YFDAS")
 
 You can now use the `gocardless.client` object to generate urls for receiving payments.::
 

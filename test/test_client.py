@@ -112,11 +112,23 @@ class ClientTestCase(unittest.TestCase):
             self.assertIsInstance(obj, expected_klass)
 
     def test_set_details_creates_client(self):
-        gocardless.set_details(mock_account_details["app_id"],
-                mock_account_details["app_secret"],
-                mock_account_details["token"],
-                mock_account_details["merchant_id"])
+        gocardless.set_details(app_id=mock_account_details["app_id"],
+                app_secret=mock_account_details["app_secret"],
+                access_token=mock_account_details["token"],
+                merchant_id=mock_account_details["merchant_id"])
         self.assertIsNotNone(gocardless.client)
+
+    def test_set_details_valueerror_raised_when_details_not_present(self):
+        details = mock_account_details.copy()
+        details["access_token"] = details["token"]
+        details.pop("token")
+        for key in details.keys():
+            #make sure that every key is required by passing in a hash with
+            #all but one key missing
+            invalid_details = details.copy()
+            invalid_details.pop(key)
+            with self.assertRaises(ValueError):
+                gocardless.set_details(**invalid_details)
 
     def test_create_bill(self):
         with patch.object(self.client, 'api_post') as mock_post:
