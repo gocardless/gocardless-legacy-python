@@ -112,7 +112,10 @@ class ClientTestCase(unittest.TestCase):
             self.assertIsInstance(obj, expected_klass)
 
     def test_set_details_creates_client(self):
-        gocardless.set_details(mock_account_details)
+        gocardless.set_details(mock_account_details["app_id"],
+                mock_account_details["app_secret"],
+                mock_account_details["token"],
+                mock_account_details["merchant_id"])
         self.assertIsNotNone(gocardless.client)
 
     def test_create_bill(self):
