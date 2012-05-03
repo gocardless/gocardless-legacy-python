@@ -1,8 +1,12 @@
+class GoCardlessError(Exception):
+    pass
 
-class ClientError(Exception):
+
+class ClientError(GoCardlessException):
     """Thrown when there was an error processing the request"""
     pass
 
-class SignatureError(Exception):
+
+class SignatureError(GoCardlessException):
     pass
 
