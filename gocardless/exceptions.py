@@ -2,11 +2,11 @@ class GoCardlessError(Exception):
     pass
 
 
-class ClientError(GoCardlessException):
+class ClientError(GoCardlessError):
     """Thrown when there was an error processing the request"""
     pass
 
 
-class SignatureError(GoCardlessException):
+class SignatureError(GoCardlessError):
     pass
 
