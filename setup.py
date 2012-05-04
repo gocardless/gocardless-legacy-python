@@ -12,7 +12,7 @@ except:
 # Dirty hack to get version number from __init__.py - we can't import it as it
 # depends on requests and requests isn't installed until this file is read
 init = os.path.join(os.path.dirname(__file__), 'gocardless', '__init__.py')
-version_line = filter(lambda l: l.startswith('VERSION'), open(init))[0]
+version_line = [line for line in open(init) if line.startswith("VERSION")][0]
 version = '.'.join(str(p) for p in eval(version_line.split('=')[-1]))
 
 CLASSIFIERS = [
