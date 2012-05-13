@@ -16,7 +16,7 @@ class Client(object):
     This class is the starting point for interacting with GoCardless.
     If you are a merchant than you can obtain a client instance by setting
     your account details in :py:func:`gocardless.set_details`.
-    
+
     If you are a
     partner and need OAuth access to other merchants' accounts then you need
     to create a client using your app id and app secret, then use the OAuth
@@ -41,13 +41,13 @@ class Client(object):
         """
         return cls.base_url or cls.BASE_URLS[gocardless.environment]
 
-    def __init__(self, app_id, app_secret, access_token=None, 
+    def __init__(self, app_id, app_secret, access_token=None,
             merchant_id=None):
         """Create a client
 
         :param string app_id: Your application id.
         :param string app_secret: Your app secret.
-        :param string access_token: The access token for this account, this should 
+        :param string access_token: The access token for this account, this should
           be your access token from the developer settings page unless you are
           trying to manage another merchants' account via OAuth.
         :param string merchant_id: The merchant id for this account, should be your
@@ -74,7 +74,7 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to post to the url.
         """
-        return self._request('post', Client.API_PATH + path, data=data, 
+        return self._request('post', Client.API_PATH + path, data=data,
                 **kwargs)
 
     def api_delete(self, path, **kwargs):
@@ -103,19 +103,19 @@ class Client(object):
             # Default to using bearer auth with the access token
             request.use_bearer_auth(self._access_token)
 
-        request.set_payload(kwargs.get('data'))        
+        request.set_payload(kwargs.get('data'))
         response = request.perform()
         if type(response) == dict and "error" in response.keys():
             raise ClientError("Error calling api, message was {0}".format(
                 response["error"]))
         return response
-        
+
     def merchant(self):
         """
         Returns the current Merchant's details.
         """
         return Merchant(self.api_get('/merchants/%s' % self._merchant_id), self)
-    
+
     def user(self, id):
         """
         Find a user by id
@@ -131,7 +131,7 @@ class Client(object):
         :params id: The pre authorization id
         """
         return PreAuthorization.find_with_client(id, self)
-    
+
     def subscription(self, id):
         """
         Returns a single subscription
@@ -150,17 +150,17 @@ class Client(object):
         """Creates a new bill under an existing pre_authorization
 
         :param amount: The amount to bill
-        :param pre_auth_id: The id of an existing pre_authorization which 
+        :param pre_auth_id: The id of an existing pre_authorization which
           has not expire
         :param name: A name for this bill
         :param description: A description for this bill
 
         """
-        return Bill.create_under_preauth(amount, pre_auth_id, self, 
+        return Bill.create_under_preauth(amount, pre_auth_id, self,
                 name=name, description=description)
-        
 
-    def new_subscription_url(self, amount, interval_length, interval_unit, 
+
+    def new_subscription_url(self, amount, interval_length, interval_unit,
             name=None, description=None, interval_count=None, start_at=None,
             expires_at=None, redirect_uri=None, cancel_uri=None, state=None,
             user=None):
@@ -175,8 +175,8 @@ class Client(object):
         :param description: The description of the subscription
         :param interval_count: The Calculates expires_at based on the number
           of intervals you would like to collect. If both interval_count and
-          expires_at are specified the expires_at parameter will take 
-          precedence 
+          expires_at are specified the expires_at parameter will take
+          precedence
         :param expires_at: When the subscription expires, should be a datetime
           object.
         :param starts_at: When the subscription starts, should be a datetime
@@ -194,15 +194,15 @@ class Client(object):
           - `email`
 
         """
-        params = urlbuilder.SubscriptionParams(amount, self._merchant_id, 
-                interval_length, interval_unit, name=name, 
-                description=description, interval_count=interval_count, 
+        params = urlbuilder.SubscriptionParams(amount, self._merchant_id,
+                interval_length, interval_unit, name=name,
+                description=description, interval_count=interval_count,
                 expires_at=expires_at, start_at=start_at, user=user)
         builder = urlbuilder.UrlBuilder(self)
-        return builder.build_and_sign(params, redirect_uri=redirect_uri, 
+        return builder.build_and_sign(params, redirect_uri=redirect_uri,
                 cancel_uri=cancel_uri, state=state)
 
-        
+
     def new_bill_url(self, amount, name=None, description=None,
             redirect_uri=None, cancel_uri=None, state=None,
             user=None):
@@ -225,12 +225,12 @@ class Client(object):
 
 
         """
-        params = urlbuilder.BillParams(amount, self._merchant_id, name=name, 
+        params = urlbuilder.BillParams(amount, self._merchant_id, name=name,
                 description=description, user=user)
         builder = urlbuilder.UrlBuilder(self)
-        return builder.build_and_sign(params, redirect_uri=redirect_uri, 
+        return builder.build_and_sign(params, redirect_uri=redirect_uri,
                 cancel_uri=cancel_uri, state=state)
-        
+
     def new_preauthorization_url(self,max_amount, interval_length,\
             interval_unit, expires_at=None, name=None, description=None,\
             interval_count=None, calendar_intervals=None,
@@ -248,7 +248,7 @@ class Client(object):
         :param expires_at: The date that this pre_authorization will
           expire, must be a datetime object which is in the future.
         :param name: A short string which is the name of the pre_authorization
-        :param description: A longer string describing what the 
+        :param description: A longer string describing what the
           pre_authorization is for.
         :param interval_count: calculates expires_at based on the number of
           payment intervals you would like the resource to have. Must be a
@@ -270,13 +270,13 @@ class Client(object):
           - `email`
 
         """
-        params = urlbuilder.PreAuthorizationParams(max_amount, 
-                self._merchant_id, interval_length, interval_unit, 
-                expires_at=expires_at, name=name, description=description, 
+        params = urlbuilder.PreAuthorizationParams(max_amount,
+                self._merchant_id, interval_length, interval_unit,
+                expires_at=expires_at, name=name, description=description,
                 interval_count=interval_count,  user=user,
                 calendar_intervals=calendar_intervals)
         builder = urlbuilder.UrlBuilder(self)
-        return builder.build_and_sign(params, redirect_uri=redirect_uri, 
+        return builder.build_and_sign(params, redirect_uri=redirect_uri,
                 cancel_uri=cancel_uri, state=state)
 
     def confirm_resource(self, params):
@@ -302,7 +302,7 @@ class Client(object):
                 "resource_type":params["resource_type"]
                 }
         self.api_post("/confirm", to_post, auth=(self._app_id, self._app_secret))
-        
+
     def new_merchant_url(self, redirect_uri, state=None, merchant=None):
         """Get a URL for managing a new merchant
 
@@ -352,7 +352,7 @@ class Client(object):
         set on the client so the client can then be used to make api calls
         on behalf of the merchant.
 
-        :param redirect_uri: The redirect_uri used in the request which 
+        :param redirect_uri: The redirect_uri used in the request which
           obtained the authorization code, must match exactly.
         :param authorization_code: The authorization code obtained in the
           previous part of the process.
@@ -376,13 +376,13 @@ class Client(object):
 
     def validate_webhook(self, params):
         """Check whether a webhook signature is valid
-        
+
         Takes a dictionary of parameters, including the signature
-        and returns a boolean indicating whether the signature is 
+        and returns a boolean indicating whether the signature is
         valid.
 
         :param params: A dictionary of data to validate, must include
           the key "signature"
         """
-        signature_valid(params, self._app_secret)
+        return signature_valid(params, self._app_secret)
 
