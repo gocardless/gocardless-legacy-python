@@ -6,9 +6,11 @@ import urlbuilder
 from gocardless.utils import generate_signature, to_query, signature_valid
 from gocardless.request import Request
 from gocardless.exceptions import ClientError, SignatureError
-from gocardless.resources import Merchant, Subscription, Bill, PreAuthorization, User
+from gocardless.resources import (Merchant, Subscription, Bill,
+                                  PreAuthorization, User)
 
 logger = logging.getLogger(__name__)
+
 
 class Client(object):
     """The main interface to the GoCardless API
@@ -27,8 +29,8 @@ class Client(object):
     API_PATH = '/api/v1'
 
     BASE_URLS = {
-      'production': 'https://gocardless.com',
-      'sandbox': 'https://sandbox.gocardless.com',
+        'production': 'https://gocardless.com',
+        'sandbox': 'https://sandbox.gocardless.com',
     }
 
     base_url = None
@@ -42,16 +44,17 @@ class Client(object):
         return cls.base_url or cls.BASE_URLS[gocardless.environment]
 
     def __init__(self, app_id, app_secret, access_token=None,
-            merchant_id=None):
+                 merchant_id=None):
         """Create a client
 
         :param string app_id: Your application id.
         :param string app_secret: Your app secret.
-        :param string access_token: The access token for this account, this should
-          be your access token from the developer settings page unless you are
-          trying to manage another merchants' account via OAuth.
-        :param string merchant_id: The merchant id for this account, should be your
-          merchant id unless you are trying to manage another account via OAuth.
+        :param string access_token: The access token for this account, this
+            should be your access token from the developer settings page unless
+            you are trying to manage another merchants' account via OAuth.
+        :param string merchant_id: The merchant id for this account, should be
+            your merchant id unless you are trying to manage another account
+            via OAuth.
         """
         self._app_id = app_id
         self._app_secret = app_secret
@@ -75,7 +78,7 @@ class Client(object):
         :param data: The data to post to the url.
         """
         return self._request('post', Client.API_PATH + path, data=data,
-                **kwargs)
+                             **kwargs)
 
     def api_delete(self, path, **kwargs):
         """Issue a delete to the API server.
@@ -114,7 +117,8 @@ class Client(object):
         """
         Returns the current Merchant's details.
         """
-        return Merchant(self.api_get('/merchants/%s' % self._merchant_id), self)
+        merchant_url = '/merchants/%s' % self._merchant_id
+        return Merchant(self.api_get(mechant_url), self)
 
     def user(self, id):
         """
@@ -157,13 +161,12 @@ class Client(object):
 
         """
         return Bill.create_under_preauth(amount, pre_auth_id, self,
-                name=name, description=description)
-
+                                         name=name, description=description)
 
     def new_subscription_url(self, amount, interval_length, interval_unit,
-            name=None, description=None, interval_count=None, start_at=None,
-            expires_at=None, redirect_uri=None, cancel_uri=None, state=None,
-            user=None):
+                             name=None, description=None, interval_count=None,
+                             start_at=None, expires_at=None, redirect_uri=None,
+                             cancel_uri=None, state=None, user=None):
         """Generate a url for creating a new subscription
 
         :param amount: The amount to charge each time
@@ -194,18 +197,19 @@ class Client(object):
           - `email`
 
         """
-        params = urlbuilder.SubscriptionParams(amount, self._merchant_id,
-                interval_length, interval_unit, name=name,
-                description=description, interval_count=interval_count,
-                expires_at=expires_at, start_at=start_at, user=user)
+        params = urlbuilder.SubscriptionParams(
+            amount, self._merchant_id,
+            interval_length, interval_unit, name=name,
+            description=description, interval_count=interval_count,
+            expires_at=expires_at, start_at=start_at, user=user
+        )
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri,
-                cancel_uri=cancel_uri, state=state)
-
+                                      cancel_uri=cancel_uri, state=state)
 
     def new_bill_url(self, amount, name=None, description=None,
-            redirect_uri=None, cancel_uri=None, state=None,
-            user=None):
+                     redirect_uri=None, cancel_uri=None, state=None,
+                     user=None):
         """Generate a url for creating a new bill
 
         :param amount: The amount to bill the customer
@@ -226,15 +230,16 @@ class Client(object):
 
         """
         params = urlbuilder.BillParams(amount, self._merchant_id, name=name,
-                description=description, user=user)
+                                       description=description, user=user)
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri,
-                cancel_uri=cancel_uri, state=state)
+                                      cancel_uri=cancel_uri, state=state)
 
-    def new_preauthorization_url(self,max_amount, interval_length,\
-            interval_unit, expires_at=None, name=None, description=None,\
-            interval_count=None, calendar_intervals=None,
-            redirect_uri=None, cancel_uri=None, state=None, user=None):
+    def new_preauthorization_url(self, max_amount, interval_length,
+                                 interval_unit, expires_at=None, name=None,
+                                 description=None, interval_count=None,
+                                 calendar_intervals=None, redirect_uri=None,
+                                 cancel_uri=None, state=None, user=None):
         """Get a url for creating new pre_authorizations
 
         :param max_amount: A float which is the maximum amount for this
@@ -252,9 +257,9 @@ class Client(object):
           pre_authorization is for.
         :param interval_count: calculates expires_at based on the number of
           payment intervals you would like the resource to have. Must be a
-          positive integer greater than 0. If you specify both an interval_count
-          and an expires_at argument then the expires_at argument will take
-          precedence.
+          positive integer greater than 0. If you specify both an
+          interval_count and an expires_at argument then the expires_at
+          argument will take precedence.
         :param calendar_intervals: Describes whether the interval resource
           should be aligned with calendar weeks or months, default is False
         :param redirect_uri: URI to redirect to after the authorization process
@@ -270,14 +275,15 @@ class Client(object):
           - `email`
 
         """
-        params = urlbuilder.PreAuthorizationParams(max_amount,
-                self._merchant_id, interval_length, interval_unit,
-                expires_at=expires_at, name=name, description=description,
-                interval_count=interval_count,  user=user,
-                calendar_intervals=calendar_intervals)
+        params = urlbuilder.PreAuthorizationParams(
+            max_amount, self._merchant_id, interval_length, interval_unit,
+            expires_at=expires_at, name=name, description=description,
+            interval_count=interval_count,  user=user,
+            calendar_intervals=calendar_intervals
+        )
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri,
-                cancel_uri=cancel_uri, state=state)
+                                      cancel_uri=cancel_uri, state=state)
 
     def confirm_resource(self, params):
         """Confirm a payment
@@ -291,17 +297,18 @@ class Client(object):
         - state (if any)
         """
         keys = ["resource_uri", "resource_id", "resource_type", "state"]
-        to_check = dict([[k,v] for k,v in params.items() if k in keys])
+        to_check = dict([[k, v] for k, v in params.items() if k in keys])
         signature = generate_signature(to_check, self._app_secret)
         if not signature == params["signature"]:
             raise SignatureError("Invalid signature when confirming resource")
         auth_string = base64.b64encode("{0}:{1}".format(
             self._app_id, self._app_secret))
         to_post = {
-                "resource_id":params["resource_id"],
-                "resource_type":params["resource_type"]
-                }
-        self.api_post("/confirm", to_post, auth=(self._app_id, self._app_secret))
+            "resource_id": params["resource_id"],
+            "resource_type": params["resource_type"],
+        }
+        auth_details = (self._app_id, self._app_secret)
+        self.api_post("/confirm", to_post, auth=auth_details)
 
     def new_merchant_url(self, redirect_uri, state=None, merchant=None):
         """Get a URL for managing a new merchant
@@ -331,17 +338,17 @@ class Client(object):
 
         """
         params = {
-                "client_id":self._app_id,
-                "redirect_uri":redirect_uri,
-                "scope":"manage_merchant",
-                "response_type":"code"
-                }
+            "client_id": self._app_id,
+            "redirect_uri": redirect_uri,
+            "scope": "manage_merchant",
+            "response_type": "code",
+        }
         if state:
             params["state"] = state
         if merchant:
             params["merchant"] = merchant
         return "{0}/oauth/authorize?{1}".format(self.get_base_url(),
-                to_query(params))
+                                                to_query(params))
 
     def fetch_access_token(self, redirect_uri, authorization_code):
         """Fetch the access token for a merchant
@@ -359,17 +366,18 @@ class Client(object):
 
         """
         params = {
-                "client_id":self._app_id,
-                "code":authorization_code,
-                "redirect_uri":redirect_uri,
-                "grant_type":"authorization_code"
-                }
+            "client_id": self._app_id,
+            "code": authorization_code,
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code"
+        }
         query = to_query(params)
         url = "/oauth/access_token?{0}".format(query)
-        #just to test the oauth call
+        # just to test the oauth call
         self.base_url = "http://sandbox.gocardless.com"
-        #have to use _request so we don't add api_base to the url
-        result =  self._request("post", url, auth=(self._app_id, self._app_secret))
+        # have to use _request so we don't add api_base to the url
+        auth_details = (self._app_id, self._app_secret)
+        result = self._request("post", url, auth=auth_details)
         self._access_token = result["access_token"]
         self._merchant_id = result["scope"].split(":")[1]
         return self._access_token

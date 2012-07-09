@@ -1,4 +1,3 @@
-
 class Merchant(object):
 
     def __init__(self, client, data):
@@ -29,6 +28,5 @@ class Merchant(object):
         """
         Return the pre_authorization with `pre_authorization_id` or `None`
         """
-        
-        
-        
+        return self.client.pre_authorization(subscription_id)
+

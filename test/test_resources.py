@@ -9,6 +9,7 @@ import fixtures
 import gocardless
 from gocardless.resources import Resource, Subscription, Bill, PreAuthorization
 
+
 class TestResource(Resource):
     endpoint = "/testendpoint/:id"
 
@@ -16,25 +17,29 @@ class TestResource(Resource):
         attrs = create_mock_attrs(attrs)
         Resource.__init__(self, attrs, client)
 
+
 class TestSubResource(Resource):
     endpoint = "/subresource/:id"
+
 
 class OtherTestSubResource(Resource):
     endpoint = "/subresource2/:id"
 
+
 def create_mock_attrs(to_merge):
     """
-    Creats an attribute set for creating a resource from, 
+    Creats an attribute set for creating a resource from,
     includes the basic created, modified and id keys. Merges
     that with to_merge
     """
     attrs = {
-            "created_at":"2012-04-18T17:53:12Z", 
-            "id":"1",
-            "merchant_id":"amerchantid"
-            }
+        "created_at": "2012-04-18T17:53:12Z",
+        "id": "1",
+        "merchant_id": "amerchantid"
+    }
     attrs.update(to_merge)
     return attrs
+
 
 class ResourceTestCase(unittest.TestCase):
 
@@ -71,11 +76,11 @@ class ResourceTestCase(unittest.TestCase):
 class ResourceSubresourceTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.resource = TestResource({"sub_resource_uris":       
+        self.resource = TestResource({"sub_resource_uris":
             {"test_sub_resources":
                 "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/bills?\
                         source_id=1580",
-             "other_test_sub_resources": "aurl"}, 
+             "other_test_sub_resources": "aurl"},
             "id":"1"},
             None)
 
@@ -105,7 +110,7 @@ class ResourceSubresourceTestCase(unittest.TestCase):
         self.resource.client = mock_client
         result = self.resource.test_sub_resources()
         self.assertIsInstance(result[0], TestSubResource)
-        
+
 
 class FindResourceTestCase(unittest.TestCase):
 
@@ -139,9 +144,9 @@ class DateResourceFieldTestCase(unittest.TestCase):
         mod_date = datetime.datetime.strptime("2020-10-10T01:01:00", "%Y-%m-%dT%H:%M:%S")
         act_date = datetime.datetime.strptime("2020-10-10T01:01:03", "%Y-%m-%dT%H:%M:%S")
         params = {
-                "modified":mod_date.isoformat() + "Z",
-                "activated":act_date.isoformat() + "Z"
-                }
+            "modified":mod_date.isoformat() + "Z",
+            "activated":act_date.isoformat() + "Z"
+        }
         res = TestDateResource(create_mock_attrs(params), None)
         self.assertEqual(res.modified, mod_date)
         self.assertEqual(res.activated, act_date)
@@ -153,17 +158,17 @@ class TestReferenceResource(Resource):
     date_fields = []
 
 class ReferenceResourceTestCase(unittest.TestCase):
-    
+
     def test_reference_fields_are_converted(self):
         params = create_mock_attrs({"test_resource_id":"2345"})
         res = TestReferenceResource(params, None)
         self.assertTrue(hasattr(res, "test_resource"))
         self.assertTrue(callable, res.test_resource)
-    
+
     def test_reference_function_calls_resource(self):
         params = create_mock_attrs({"test_resource_id":"2345"})
         res = TestReferenceResource(params, None)
-        with patch.object(TestResource, 
+        with patch.object(TestResource,
                 'find_with_client') as mock_res:
             mock_res.return_value = "1234"
             self.assertEqual("1234", res.test_resource())
@@ -176,7 +181,7 @@ class ReferenceResourceTestCase(unittest.TestCase):
 
     def test_date_with_null_attr_does_not_throw(self):
         params = create_mock_attrs({"modified_at":None})
-        testclass = type("TestModResource", (Resource,), 
+        testclass = type("TestModResource", (Resource,),
                 {"date_fields":["modified_at"]})
         res = testclass(params, None)
 
@@ -191,10 +196,8 @@ class SubscriptionCancelTestCase(unittest.TestCase):
             fixtures.subscription_json["id"]))
 
 
-
-
 class PreAuthBillCreationTestCase(unittest.TestCase):
-    
+
     def test_create_bill_calls_client_api_post(self):
         client = mock.Mock()
         client.api_post.return_value = fixtures.bill_json
@@ -218,9 +221,5 @@ class PreAuthBillCreationTestCase(unittest.TestCase):
        mock_bill_class.create_under_preauth.assert_called_with(10,
                pre_auth.id, None, name="aname",
                description="adesc")
-
-
-
-
 
 

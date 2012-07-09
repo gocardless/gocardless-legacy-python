@@ -23,6 +23,7 @@ style API. For example, to get all of a merchants bills:
 
 VERSION = (0, 1, 2)
 
+
 def get_version():
     return '.'.join(str(part) for part in VERSION)
 
@@ -30,7 +31,8 @@ from .client import Client
 
 #import as clientlib so that we don't shadow with the client variable
 import client as clientlib
-from gocardless.resources import Bill, Subscription, PreAuthorization, User, Merchant
+from gocardless.resources import (Bill, Subscription, PreAuthorization, User,
+                                  Merchant)
 
 environment = 'production'
 """The environment GoCardless executes API requests against, should be
@@ -42,7 +44,9 @@ client = None
 :py:func:`gocardless.set_details` has been called.
 """
 
-def set_details(app_id=None, app_secret=None, access_token=None, merchant_id=None):
+
+def set_details(app_id=None, app_secret=None, access_token=None,
+                merchant_id=None):
     """Set the global account details to use for requests
 
     The parameters are your security details which can be found
@@ -58,6 +62,6 @@ def set_details(app_id=None, app_secret=None, access_token=None, merchant_id=Non
         raise ValueError("merchant_id is required")
 
     global client
-    client = Client(app_id, app_secret, access_token=access_token, 
-            merchant_id=merchant_id)
+    client = Client(app_id, app_secret, access_token=access_token,
+                    merchant_id=merchant_id)
 

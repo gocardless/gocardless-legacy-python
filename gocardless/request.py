@@ -10,8 +10,9 @@ class Request(object):
         self._url = url
         headers = {}
         headers["Accept"] = "application/json"
-        headers["User-Agent"] = "gocardless-python/{0}".format(gocardless.get_version())
-        self._opts = {"headers" : headers }
+        lib_version = gocardless.get_version()
+        headers["User-Agent"] = "gocardless-python/{0}".format(lib_version)
+        self._opts = {"headers": headers}
 
         if not self._valid_method(method):
             raise ValueError('Invalid method {}'.format(method))

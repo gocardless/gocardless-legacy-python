@@ -16,23 +16,26 @@ from gocardless.client import Client
 from gocardless import utils, urlbuilder, resources
 from gocardless.exceptions import SignatureError, ClientError
 from test_resources import create_mock_attrs
+
 mock_account_details = {
-            'app_id': 'id01',
-            'app_secret': 'sec01',
-            'token': 'tok01',
-            'merchant_id': fixtures.merchant_json["id"],
-        }
+    'app_id': 'id01',
+    'app_secret': 'sec01',
+    'token': 'tok01',
+    'merchant_id': fixtures.merchant_json["id"],
+}
+
+
 def create_mock_client(details):
     return Client(details["app_id"],
             details["app_secret"],
             access_token=details["token"],
             merchant_id=details["merchant_id"])
 
+
 def get_url_params(url):
     param_dict = urlparse.parse_qs(urlparse.urlparse(url).query)
     return dict([[k,v[0]] for k,v in param_dict.items()])
 
-    
 
 class ClientTestCase(unittest.TestCase):
 
@@ -95,7 +98,7 @@ class ClientTestCase(unittest.TestCase):
                 "expires_at":mock_date,
                 "next_interval_start":mock_date
                 }
-        self._get_resource_tester("pre_authorization", 
+        self._get_resource_tester("pre_authorization",
                 create_mock_attrs(mock_attrs))
 
     def test_get_bill(self):
@@ -140,7 +143,7 @@ class ClientTestCase(unittest.TestCase):
             mock_bill = resources.Bill(fixtures.bill_json.copy(), self.client)
             mock_post.return_value = fixtures.bill_json
             res = self.client.create_bill(10, "someid")
-            mock_post.assert_called_with("/bills", 
+            mock_post.assert_called_with("/bills",
                     {"bill":expected_params})
             self.assertEqual(res, mock_bill)
 
@@ -170,7 +173,7 @@ class ConfirmResourceTestCase(unittest.TestCase):
             self.client.confirm_resource(self.params)
 
     def test_resource_posts(self):
-        self.params["signature"] = utils.generate_signature(self.params, 
+        self.params["signature"] = utils.generate_signature(self.params,
                 mock_account_details["app_secret"])
         with patch.object(self.client, 'api_post') as mock_post:
             expected_data = {
@@ -181,7 +184,7 @@ class ConfirmResourceTestCase(unittest.TestCase):
                 mock_account_details["app_secret"])
             self.client.confirm_resource(self.params)
             expected_path = "/confirm"
-            mock_post.assert_called_with(expected_path, 
+            mock_post.assert_called_with(expected_path,
                 expected_data, auth=expected_auth)
 
 
@@ -228,7 +231,7 @@ class UrlBuilderTestCase(unittest.TestCase):
         url = self.urlbuilder.build_and_sign(params)
         urlparams = get_url_params(url)
         self.assertTrue(urlparams.has_key("bill[amount]"))
-        
+
 
     def test_add_merchant_id_to_limit(self):
         params = self.make_mock_params({"resource_name": "bill",
@@ -251,7 +254,7 @@ class UrlBuilderTestCase(unittest.TestCase):
 
     def test_url_contains_cancel(self):
         params = self.make_mock_params({})
-        url = self.urlbuilder.build_and_sign(params, 
+        url = self.urlbuilder.build_and_sign(params,
                 cancel_uri="http://cancel")
         urlparams = get_url_params(url)
         self.assertEqual(urlparams["cancel_uri"], "http://cancel")
@@ -333,7 +336,7 @@ class MerchantUrlTestCase(unittest.TestCase):
                 "response_type":"code"
                 }
         self.assertEqual(expected, params)
-    
+
     def test_merchant_url_with_merchant_prepop(self):
         merchant = {
                 "name":"merchname",
@@ -352,7 +355,7 @@ class MerchantUrlTestCase(unittest.TestCase):
         params = get_url_params(url)
         self.assertEqual(params["merchant[name]"], "merchname")
         self.assertEqual(params["merchant[user][first_name]"], "nameone")
-    
+
     def test_merchant_url_state(self):
         url = self.client.new_merchant_url("http://someurl", state="thestate")
         params = get_url_params(url)
@@ -374,7 +377,7 @@ class MerchantUrlTestCase(unittest.TestCase):
             mock_request.return_value = self.access_token_response
             self.client.fetch_access_token(expected_data["redirect_uri"],
                     self.mock_auth_code)
-            mock_request.assert_called_with("post", "/oauth/" 
+            mock_request.assert_called_with("post", "/oauth/"
                 "access_token?{0}".format(query), auth=expected_auth)
 
     def test_fetch_client_sets_access_token_and_merchant_id(self):
@@ -401,7 +404,7 @@ class Matcher(object):
 class ClientUrlBuilderTestCase(unittest.TestCase):
     """Integration test for the Client <-> UrlBuilder relationship
 
-    Tests that the url building methods on the client correctly 
+    Tests that the url building methods on the client correctly
     call methods on the urlbuilder class
     """
 
@@ -415,7 +418,7 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
             matcher = Matcher(lambda x: type(x) == expected_type)
             mock_inst.build_and_sign.assert_called_with(matcher,
                     cancel_uri=None, redirect_uri=None, state=None)
-    
+
     def params_argument_check(self, method, params_class, *args, **kwargs):
         with patch('gocardless.urlbuilder.UrlBuilder') as mock_builder:
             with patch('gocardless.urlbuilder.{0}'.format(params_class.__name__)) as mock_class:
@@ -423,12 +426,12 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
                 getattr(c, method)(*args, **kwargs)
                 arg1 = args[0]
                 rest = args[1:]
-                mock_class.assert_called_with(arg1, 
+                mock_class.assert_called_with(arg1,
                         mock_account_details["merchant_id"], *rest,
                         **kwargs)
-    
+
     def test_new_preauth_calls_urlbuilder(self):
-        self.urlbuilder_argument_check("new_preauthorization_url", 
+        self.urlbuilder_argument_check("new_preauthorization_url",
                 urlbuilder.PreAuthorizationParams,
                 3, 7, "day")
 
@@ -438,7 +441,7 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
                 3, 7, "day", expires_at=datetime.datetime.now(),
                 name="aname", description="desc", interval_count=5,
                 calendar_intervals=False, user={"somekey":"somval"})
-        
+
     def test_new_bill_calls_urlbuilder(self):
         self.urlbuilder_argument_check("new_bill_url",
                 urlbuilder.BillParams,
@@ -457,16 +460,10 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
 
     def test_new_sub_params_constructor(self):
         self.params_argument_check("new_subscription_url",
-                urlbuilder.SubscriptionParams, 
-                10, 23, "day", name="name", description="adesc", 
+                urlbuilder.SubscriptionParams,
+                10, 23, "day", name="name", description="adesc",
                 start_at=datetime.datetime.now(),
                 expires_at=datetime.datetime.now() + datetime.timedelta(100),
                 interval_count=20, user={"key":"val"})
-
-
-
-
-
-
 
 
