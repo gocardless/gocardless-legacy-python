@@ -127,7 +127,7 @@ class Client(object):
         Returns the current Merchant's details.
         """
         merchant_url = '/merchants/%s' % self._merchant_id
-        return Merchant(self.api_get(mechant_url), self)
+        return Merchant(self.api_get(merchant_url), self)
 
     def user(self, id):
         """

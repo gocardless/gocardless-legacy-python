@@ -146,6 +146,10 @@ class PreAuthorization(Resource):
         return Bill.create_under_preauth(amount, self.id, self.client,
                                          name=name, description=description)
 
+    def cancel(self):
+        path = "{0}/cancel".format(self.endpoint.replace(":id", self.id))
+        self.client.api_put(path)
+
 
 class Bill(Resource):
     endpoint = "/bills/:id"

@@ -1,3 +1,7 @@
+## 0.1.3 - August 6, 2012
+
+- Added cancel method for pre-authorizations and subscriptions.
+
 ## 0.1.2 - May 14, 2012
 
 - Fixed gocardless.Client.validate_webhook, it was not returning a value.

@@ -195,6 +195,16 @@ class SubscriptionCancelTestCase(unittest.TestCase):
         client.api_put.assert_called_with("/subscriptions/{0}/cancel".format(
             fixtures.subscription_json["id"]))
 
+class PreAuthCancelTestCase(unittest.TestCase):
+
+    def test_cancel_puts(self):
+        client = mock.Mock()
+        preauth= PreAuthorization(fixtures.preauth_json, client)
+        preauth.cancel()
+        client.api_put.assert_called_with(
+                "/pre_authorizations/{0}/cancel".format(
+                    fixtures.preauth_json["id"]))
+
 
 class PreAuthBillCreationTestCase(unittest.TestCase):
 
