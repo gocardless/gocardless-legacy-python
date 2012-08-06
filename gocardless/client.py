@@ -80,7 +80,7 @@ class Client(object):
         return self._request('post', Client.API_PATH + path, data=data,
                              **kwargs)
 
-    def api_put(self, path, data, **kwargs):
+    def api_put(self, path, data={}, **kwargs):
         """Issue a PUT request to the API server
 
         :param path: The path that will be added to the API prefix
