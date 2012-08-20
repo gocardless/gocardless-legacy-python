@@ -159,7 +159,7 @@ class SubscriptionParams(BasicParams):
 
     def __init__(self, amount, merchant_id, interval_length, interval_unit,
                  name=None, description=None, start_at=None, expires_at=None,
-                 interval_count=None, user=None):
+                 interval_count=None, user=None, setup_fee=None):
         BasicParams.__init__(self, amount, merchant_id, user=user,
                              description=description, name=name)
         self.resource_name = "subscriptions"
@@ -196,10 +196,11 @@ class SubscriptionParams(BasicParams):
 
         self.name = name if name else None
         self.description = description if description else None
+        self.setup_fee = setup_fee
 
         self.attrnames.extend([
             "description", "interval_count", "interval_unit",
-            "interval_length", "expires_at", "start_at"
+            "interval_length", "expires_at", "start_at", "setup_fee"
         ])
 
     def check_date_in_future(self, date, argname):

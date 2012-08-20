@@ -8,12 +8,12 @@ from gocardless import utils, urlbuilder
 
 class ExpiringLimitTestCase(object):
     """superclass factoring out tests for expiring limit param objects"""
-    
+
     def test_interval_length_is_positive(self):
         pars = self.create_params(10, "1321230", 1, "day")
         with self.assertRaises(ValueError):
             pars = self.create_params(10, "1123210", -1, "day")
- 
+
     def test_interval_unit_is_valid(self):
         for interval_unit in ["day", "week", "month"]:
             pars = self.create_params(10, 10, "11235432", interval_unit)
@@ -25,7 +25,7 @@ class ExpiringLimitTestCase(object):
         valid_date = datetime.datetime.now() + datetime.timedelta(2000)
         par1 = self.create_params(10, 10, "23423421", "day", **{argname:valid_date})
         with self.assertRaises(ValueError):
-            par1 = self.create_params(10, 10, "2342341", "day", 
+            par1 = self.create_params(10, 10, "2342341", "day",
                     **{argname:invalid_date})
 
     def test_expires_at_in_future(self):
@@ -40,7 +40,7 @@ class PreAuthParamsTestCase(ExpiringLimitTestCase, unittest.TestCase):
     def default_args_construct(self, extra_options):
         """
         For testing optional arguments, builds the param object with valid
-        required arguments and adds optionl arguments as keywords from 
+        required arguments and adds optionl arguments as keywords from
         `extra_options`
 
         :param extra_options: Extra optional keyword arguments to pass to
@@ -55,7 +55,7 @@ class PreAuthParamsTestCase(ExpiringLimitTestCase, unittest.TestCase):
     def test_max_amount_is_positive(self):
         self.assertRaises(ValueError, \
                 urlbuilder.PreAuthorizationParams, -1, "1232532", 4, "month")
-    
+
     def test_interval_length_is_a_positive_integer(self):
         self.assertRaises(ValueError, \
                 urlbuilder.PreAuthorizationParams, 12, "!2343", -3, "month")
@@ -75,7 +75,7 @@ class PreAuthParamsTestCase(ExpiringLimitTestCase, unittest.TestCase):
         self.assertRaises(ValueError, self.default_args_construct, \
                 {"interval_count":-1})
 
-        
+
 class PreAuthParamsToDictTestCase(unittest.TestCase):
     def setUp(self):
         self.all_params = {
@@ -139,7 +139,7 @@ class BillParamsTestCase(unittest.TestCase):
                 "merchant_id":"merchid"
                 }
         self.assertEqual(res, expected)
-    
+
     def test_resource_name_is_bills(self):
         pars = urlbuilder.BillParams(10, "merchid")
         self.assertEqual(pars.resource_name, "bills")
@@ -150,12 +150,23 @@ class SubscriptionParamsTestCase(ExpiringLimitTestCase, unittest.TestCase):
     def create_params(self, *args, **kwargs):
         return urlbuilder.SubscriptionParams(*args, **kwargs)
 
+    def test_setup_fee(self):
+        pars = self.create_params(10, "merchid", 10, "day", setup_fee=20)
+        expected = {
+                "merchant_id": "merchid",
+                "amount": 10,
+                "interval_length": 10,
+                "interval_unit" : "day",
+                "setup_fee": 20
+                }
+        self.assertEqual(expected, pars.to_dict())
+
     def test_start_at_in_future(self):
         valid_date = datetime.datetime.now() + datetime.timedelta(200)
         invalid_date = datetime.datetime.now() - datetime.timedelta(100)
         par1 = self.create_params(10,"merchid", 10, "day", start_at=valid_date)
         with self.assertRaises(ValueError):
-            par2 = self.create_params(10, "merchid", 10, "day", 
+            par2 = self.create_params(10, "merchid", 10, "day",
                     start_at=invalid_date)
 
     def test_expires_at_after_start_at(self):
@@ -181,7 +192,7 @@ class SubscriptionParamsTestCase(ExpiringLimitTestCase, unittest.TestCase):
         expires_at =datetime.datetime.now() + datetime.timedelta(2000)
         expected = {
                 "merchant_id":"merchid",
-                "amount":10, 
+                "amount":10,
                 "interval_length":10,
                 "interval_unit":"day",
                 "interval_count":5,
