@@ -1,3 +1,7 @@
+## 0.1.4 - August 20, 2012
+
+- Added setup_fee argument to new_subscription_url on client
+
 ## 0.1.3 - August 6, 2012
 
 - Added cancel method for pre-authorizations and subscriptions.

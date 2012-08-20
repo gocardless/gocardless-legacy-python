@@ -464,6 +464,6 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
                 10, 23, "day", name="name", description="adesc",
                 start_at=datetime.datetime.now(),
                 expires_at=datetime.datetime.now() + datetime.timedelta(100),
-                interval_count=20, user={"key":"val"})
+                interval_count=20, user={"key":"val"}, setup_fee=20)
 
 
