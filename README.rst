@@ -1,4 +1,4 @@
-.. image:: https://gocardless.com/resources/logo.png
+.. image:: https://s3-eu-west-1.amazonaws.com/gocardless/images/gocardless-dark.png
 
 The GoCardless Python Client Library
 ====================================
