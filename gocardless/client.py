@@ -174,7 +174,8 @@ class Client(object):
     def new_subscription_url(self, amount, interval_length, interval_unit,
                              name=None, description=None, interval_count=None,
                              start_at=None, expires_at=None, redirect_uri=None,
-                             cancel_uri=None, state=None, user=None, setup_fee=None):
+                             cancel_uri=None, state=None, user=None,
+                             setup_fee=None):
         """Generate a url for creating a new subscription
 
         :param amount: The amount to charge each time
@@ -289,7 +290,7 @@ class Client(object):
         params = urlbuilder.PreAuthorizationParams(
             max_amount, self._merchant_id, interval_length, interval_unit,
             expires_at=expires_at, name=name, description=description,
-            interval_count=interval_count,  user=user,
+            interval_count=interval_count, user=user,
             calendar_intervals=calendar_intervals
         )
         builder = urlbuilder.UrlBuilder(self)
