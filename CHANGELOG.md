@@ -1,3 +1,7 @@
+## 0.1.5 - August 20, 2012
+
+- Remove hard-coded sandbox URL
+
 ## 0.1.4 - August 20, 2012
 
 - Added setup_fee argument to new_subscription_url on client
