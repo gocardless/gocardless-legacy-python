@@ -11,6 +11,12 @@ from gocardless.resources import (Merchant, Subscription, Bill,
 
 logger = logging.getLogger(__name__)
 
+API_PATH = '/api/v1'
+BASE_URLS = {
+    'production': 'https://gocardless.com',
+    'sandbox': 'https://sandbox.gocardless.com',
+}
+
 
 class Client(object):
     """The main interface to the GoCardless API
@@ -26,13 +32,6 @@ class Client(object):
 
     """
 
-    API_PATH = '/api/v1'
-
-    BASE_URLS = {
-        'production': 'https://gocardless.com',
-        'sandbox': 'https://sandbox.gocardless.com',
-    }
-
     base_url = None
 
     @classmethod
@@ -41,7 +40,7 @@ class Client(object):
         Return the correct base URL for the current environment. If one has
         been manually set, default to that.
         """
-        return cls.base_url or cls.BASE_URLS[gocardless.environment]
+        return cls.base_url or BASE_URLS[gocardless.environment]
 
     def __init__(self, app_id, app_secret, access_token=None,
                  merchant_id=None):
@@ -69,7 +68,7 @@ class Client(object):
 
         :param path: the path that will be added to the API prefix
         """
-        return self._request('get', self.API_PATH + path, **kwargs)
+        return self._request('get', API_PATH + path, **kwargs)
 
     def api_post(self, path, data, **kwargs):
         """Issue a POST request to the API server
@@ -77,7 +76,7 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to post to the url.
         """
-        return self._request('post', self.API_PATH + path, data=data,
+        return self._request('post', API_PATH + path, data=data,
                              **kwargs)
 
     def api_put(self, path, data={}, **kwargs):
@@ -86,7 +85,7 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to put to the url.
         """
-        return self._request('put', self.API_PATH + path, data=data,
+        return self._request('put', API_PATH + path, data=data,
                              **kwargs)
 
     def api_delete(self, path, **kwargs):
@@ -95,7 +94,7 @@ class Client(object):
         :param path: the path that will be added to the API prefix
         :param params: query string parameters
         """
-        return self._request('delete', self.API_PATH + path, **kwargs)
+        return self._request('delete', API_PATH + path, **kwargs)
 
     def _request(self, method, path, **kwargs):
         """
