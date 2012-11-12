@@ -69,7 +69,7 @@ class Client(object):
 
         :param path: the path that will be added to the API prefix
         """
-        return self._request('get', Client.API_PATH + path, **kwargs)
+        return self._request('get', self.API_PATH + path, **kwargs)
 
     def api_post(self, path, data, **kwargs):
         """Issue a POST request to the API server
@@ -77,7 +77,7 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to post to the url.
         """
-        return self._request('post', Client.API_PATH + path, data=data,
+        return self._request('post', self.API_PATH + path, data=data,
                              **kwargs)
 
     def api_put(self, path, data={}, **kwargs):
@@ -86,7 +86,7 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to put to the url.
         """
-        return self._request('put', Client.API_PATH + path, data=data,
+        return self._request('put', self.API_PATH + path, data=data,
                              **kwargs)
 
     def api_delete(self, path, **kwargs):
@@ -95,7 +95,7 @@ class Client(object):
         :param path: the path that will be added to the API prefix
         :param params: query string parameters
         """
-        return self._request('delete', Client.API_PATH + path, **kwargs)
+        return self._request('delete', self.API_PATH + path, **kwargs)
 
     def _request(self, method, path, **kwargs):
         """
@@ -104,7 +104,7 @@ class Client(object):
         :param method: the HTTP method to use (e.g. +:get+, +:post+)
         :param path: the path fragment of the URL
         """
-        request_url = Client.get_base_url() + path
+        request_url = self.get_base_url() + path
         request = Request(method, request_url)
         logger.debug("Executing request to {0}".format(request_url))
 
@@ -385,8 +385,6 @@ class Client(object):
         }
         query = to_query(params)
         url = "/oauth/access_token?{0}".format(query)
-        # just to test the oauth call
-        self.base_url = "http://sandbox.gocardless.com"
         # have to use _request so we don't add api_base to the url
         auth_details = (self._app_id, self._app_secret)
         result = self._request("post", url, auth=auth_details)
