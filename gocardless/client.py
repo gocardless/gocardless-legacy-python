@@ -297,6 +297,9 @@ class Client(object):
         return builder.build_and_sign(params, redirect_uri=redirect_uri,
                                       cancel_uri=cancel_uri, state=state)
 
+    def new_pre_authorization_url(self, *args, **kwargs):
+        return self.new_preauthorization_url(*args, **kwargs)
+
     def confirm_resource(self, params):
         """Confirm a payment
 
