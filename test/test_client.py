@@ -445,14 +445,16 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
                 urlbuilder.PreAuthorizationParams,
                 3, 7, "day", expires_at=datetime.datetime.now(),
                 name="aname", description="desc", interval_count=5,
-                calendar_intervals=False, user={"somekey":"somval"})
+                calendar_intervals=False, user={"somekey":"somval"},
+                setup_fee=None)
 
     def test_new_pre_auth_params_constructor(self):
         self.params_argument_check("new_pre_authorization_url",
                 urlbuilder.PreAuthorizationParams,
                 3, 7, "day", expires_at=datetime.datetime.now(),
                 name="aname", description="desc", interval_count=5,
-                calendar_intervals=False, user={"somekey":"somval"})
+                calendar_intervals=False, user={"somekey":"somval"},
+                setup_fee=None)
 
     def test_new_bill_calls_urlbuilder(self):
         self.urlbuilder_argument_check("new_bill_url",
