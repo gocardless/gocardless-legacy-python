@@ -99,9 +99,6 @@ class PreAuthorizationParams(object):
                     positive value passed was {0}""".format(max_amount))
         self.max_amount = max_amount
         
-        if not setup_fee > 0:
-            raise ValueError("""setup_fee must be
-                    positive value passed was {0}""".format(setup_fee))
         self.setup_fee = setup_fee
 
         if not interval_length > 0:
