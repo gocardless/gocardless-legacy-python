@@ -251,7 +251,8 @@ class Client(object):
                                  interval_unit, expires_at=None, name=None,
                                  description=None, interval_count=None,
                                  calendar_intervals=None, redirect_uri=None,
-                                 cancel_uri=None, state=None, user=None):
+                                 cancel_uri=None, state=None, user=None,
+                                 setup_fee=None):
         """Get a url for creating new pre_authorizations
 
         :param max_amount: A float which is the maximum amount for this
@@ -285,13 +286,15 @@ class Client(object):
           - `first_name`
           - `last_name`
           - `email`
+        :param setup_fee: A one off payment which will be taken at the start
+          of the subscription.
 
         """
         params = urlbuilder.PreAuthorizationParams(
             max_amount, self._merchant_id, interval_length, interval_unit,
             expires_at=expires_at, name=name, description=description,
             interval_count=interval_count, user=user,
-            calendar_intervals=calendar_intervals
+            calendar_intervals=calendar_intervals, setup_fee=setup_fee
         )
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri,

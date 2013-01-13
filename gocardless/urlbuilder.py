@@ -85,7 +85,8 @@ class PreAuthorizationParams(object):
 
     def __init__(self, max_amount, merchant_id, interval_length,
                  interval_unit, expires_at=None, name=None, description=None,
-                 interval_count=None, calendar_intervals=None, user=None):
+                 interval_count=None, calendar_intervals=None, user=None,
+                 setup_fee=None):
 
         self.merchant_id = merchant_id
         self.resource_name = "pre_authorizations"
@@ -97,6 +98,11 @@ class PreAuthorizationParams(object):
             raise ValueError("""max_amount must be
                     positive value passed was {0}""".format(max_amount))
         self.max_amount = max_amount
+        
+        if not setup_fee > 0:
+            raise ValueError("""setup_fee must be
+                    positive value passed was {0}""".format(setup_fee))
+        self.setup_fee = setup_fee
 
         if not interval_length > 0:
             raise ValueError("interval_length must be positive, value "
@@ -137,7 +143,7 @@ class PreAuthorizationParams(object):
         attrnames = [
             "merchant_id", "name", "description", "interval_count",
             "interval_unit", "interval_length", "max_amount",
-            "calendar_intervals", "expires_at", "user"
+            "calendar_intervals", "expires_at", "user", "setup_fee"
         ]
         for attrname in attrnames:
             val = getattr(self, attrname, None)
