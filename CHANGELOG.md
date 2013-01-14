@@ -1,3 +1,7 @@
+## 0.2.0 - January 14, 2013
+
+- Add missing setup_fee parameter
+
 ## 0.1.5 - August 20, 2012
 
 - Remove hard-coded sandbox URL
