@@ -15,7 +15,7 @@ class Request(object):
         self._opts = {"headers": headers}
 
         if not self._valid_method(method):
-            raise ValueError('Invalid method {}'.format(method))
+            raise ValueError('Invalid method {0}'.format(method))
 
     def _valid_method(self, method):
         return method in ('get', 'post', 'put')
@@ -24,7 +24,7 @@ class Request(object):
         self._opts['auth'] = (username, password)
 
     def use_bearer_auth(self, token):
-        auth_header = 'bearer {}'.format(token)
+        auth_header = 'bearer {0}'.format(token)
         self._opts['headers']['Authorization'] = auth_header
 
     def set_payload(self, payload):
