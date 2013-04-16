@@ -232,4 +232,14 @@ class PreAuthBillCreationTestCase(unittest.TestCase):
                pre_auth.id, None, name="aname",
                description="adesc")
 
+class BillRetryTestCase(unittest.TestCase):
+
+    def test_retry_post(self):
+        client = mock.Mock()
+        bill=Bill(fixtures.bill_json, client)
+        bill.retry()
+        client.api_post.assert_called_with(
+                "/bills/{0}/retry".format(
+                    fixtures.bill_json["id"]))
+
 

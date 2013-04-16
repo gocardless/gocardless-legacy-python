@@ -1,3 +1,8 @@
+## 0.1.5 - April 16, 2013
+
+- Adds support for "retry" method on Bill, which allows a bill with status
+'failed' to be re-attempted
+
 ## 0.1.4 - August 20, 2012
 
 - Added setup_fee argument to new_subscription_url on client

@@ -172,6 +172,10 @@ class Bill(Resource):
             params["bill"]["description"] = description
         return Bill(client.api_post(path, params), client)
 
+    def retry(self):
+        path = "{0}/retry".format(self.endpoint.replace(":id", self.id))
+        self.client.api_post(path)
+
 
 class User(Resource):
     endpoint = "/users/:id"
