@@ -1,3 +1,8 @@
+## 0.2.2 - April 16, 2013
+
+- Adds support for "retry" method on Bill, which allows a bill with status
+'failed' to be re-attempted
+
 ## 0.2.0 - January 14, 2013
 
 - Add missing setup_fee parameter
@@ -5,6 +10,7 @@
 ## 0.1.5 - August 20, 2012
 
 - Remove hard-coded sandbox URL
+>>>>>>> 4bba819cf0bebf7a06d879bd661c2ab782f60983
 
 ## 0.1.4 - August 20, 2012
 
