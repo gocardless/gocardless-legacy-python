@@ -11,6 +11,12 @@ from gocardless.resources import (Merchant, Subscription, Bill,
 
 logger = logging.getLogger(__name__)
 
+API_PATH = '/api/v1'
+BASE_URLS = {
+    'production': 'https://gocardless.com',
+    'sandbox': 'https://sandbox.gocardless.com',
+}
+
 
 class Client(object):
     """The main interface to the GoCardless API
@@ -26,13 +32,6 @@ class Client(object):
 
     """
 
-    API_PATH = '/api/v1'
-
-    BASE_URLS = {
-        'production': 'https://gocardless.com',
-        'sandbox': 'https://sandbox.gocardless.com',
-    }
-
     base_url = None
 
     @classmethod
@@ -41,7 +40,7 @@ class Client(object):
         Return the correct base URL for the current environment. If one has
         been manually set, default to that.
         """
-        return cls.base_url or cls.BASE_URLS[gocardless.environment]
+        return cls.base_url or BASE_URLS[gocardless.environment]
 
     def __init__(self, app_id, app_secret, access_token=None,
                  merchant_id=None):
@@ -69,7 +68,7 @@ class Client(object):
 
         :param path: the path that will be added to the API prefix
         """
-        return self._request('get', Client.API_PATH + path, **kwargs)
+        return self._request('get', API_PATH + path, **kwargs)
 
     def api_post(self, path, data, **kwargs):
         """Issue a POST request to the API server
@@ -77,7 +76,7 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to post to the url.
         """
-        return self._request('post', Client.API_PATH + path, data=data,
+        return self._request('post', API_PATH + path, data=data,
                              **kwargs)
 
     def api_put(self, path, data={}, **kwargs):
@@ -86,7 +85,7 @@ class Client(object):
         :param path: The path that will be added to the API prefix
         :param data: The data to put to the url.
         """
-        return self._request('put', Client.API_PATH + path, data=data,
+        return self._request('put', API_PATH + path, data=data,
                              **kwargs)
 
     def api_delete(self, path, **kwargs):
@@ -95,7 +94,7 @@ class Client(object):
         :param path: the path that will be added to the API prefix
         :param params: query string parameters
         """
-        return self._request('delete', Client.API_PATH + path, **kwargs)
+        return self._request('delete', API_PATH + path, **kwargs)
 
     def _request(self, method, path, **kwargs):
         """
@@ -104,7 +103,7 @@ class Client(object):
         :param method: the HTTP method to use (e.g. +:get+, +:post+)
         :param path: the path fragment of the URL
         """
-        request_url = Client.get_base_url() + path
+        request_url = self.get_base_url() + path
         request = Request(method, request_url)
         logger.debug("Executing request to {0}".format(request_url))
 
@@ -175,7 +174,8 @@ class Client(object):
     def new_subscription_url(self, amount, interval_length, interval_unit,
                              name=None, description=None, interval_count=None,
                              start_at=None, expires_at=None, redirect_uri=None,
-                             cancel_uri=None, state=None, user=None, setup_fee=None):
+                             cancel_uri=None, state=None, user=None,
+                             setup_fee=None):
         """Generate a url for creating a new subscription
 
         :param amount: The amount to charge each time
@@ -251,7 +251,8 @@ class Client(object):
                                  interval_unit, expires_at=None, name=None,
                                  description=None, interval_count=None,
                                  calendar_intervals=None, redirect_uri=None,
-                                 cancel_uri=None, state=None, user=None):
+                                 cancel_uri=None, state=None, user=None,
+                                 setup_fee=None):
         """Get a url for creating new pre_authorizations
 
         :param max_amount: A float which is the maximum amount for this
@@ -285,17 +286,23 @@ class Client(object):
           - `first_name`
           - `last_name`
           - `email`
+        :param setup_fee: A one off payment which will be taken at the start
+          of the subscription.
 
         """
         params = urlbuilder.PreAuthorizationParams(
             max_amount, self._merchant_id, interval_length, interval_unit,
             expires_at=expires_at, name=name, description=description,
-            interval_count=interval_count,  user=user,
-            calendar_intervals=calendar_intervals
+            interval_count=interval_count, user=user,
+            calendar_intervals=calendar_intervals, setup_fee=setup_fee
         )
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri,
                                       cancel_uri=cancel_uri, state=state)
+
+    # Create an alias to new_preauthorization_url to conform to the
+    # documentation
+    new_pre_authorization_url = new_preauthorization_url
 
     def confirm_resource(self, params):
         """Confirm a payment
@@ -385,8 +392,6 @@ class Client(object):
         }
         query = to_query(params)
         url = "/oauth/access_token?{0}".format(query)
-        # just to test the oauth call
-        self.base_url = "http://sandbox.gocardless.com"
         # have to use _request so we don't add api_base to the url
         auth_details = (self._app_id, self._app_secret)
         result = self._request("post", url, auth=auth_details)
