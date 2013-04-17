@@ -236,10 +236,9 @@ class BillRetryTestCase(unittest.TestCase):
 
     def test_retry_post(self):
         client = mock.Mock()
-        bill=Bill(fixtures.bill_json, client)
+        bill = Bill(fixtures.bill_json, client)
         bill.retry()
-        client.api_post.assert_called_with(
-                "/bills/{0}/retry".format(
-                    fixtures.bill_json["id"]))
+        retry_url = "/bills/{0}/retry".format(fixtures.bill_json["id"])
+        client.api_post.assert_called_with(retry_url)
 
 
