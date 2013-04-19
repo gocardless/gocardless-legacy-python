@@ -337,11 +337,11 @@ class Client(object):
           merchant sign up page, can contain any of the keys:
 
           - "name"
-          - "billing_address_1"
-          - "billing_address_2"
-          - "billing_town"
-          - "billing_county"
-          - "billing_postcode"
+          - "phone_number"
+          - "description"
+          - "merchant_type" (either 'business', 'charity' or 'individual')
+          - "company_name"
+          - "company_registration"
           - "user" which can be a dictionary containing the keys:
 
             - "first_name"
