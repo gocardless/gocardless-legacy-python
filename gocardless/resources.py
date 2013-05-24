@@ -154,7 +154,7 @@ class PreAuthorization(Resource):
 class Bill(Resource):
     endpoint = "/bills/:id"
     date_fields = ["paid_at"]
-    reference_fields = ["merchant_id", "user_id"]
+    reference_fields = ["merchant_id", "user_id", "payout_id"]
 
     @classmethod
     def create_under_preauth(self, amount, pre_auth_id, client, name=None,
@@ -176,6 +176,9 @@ class Bill(Resource):
         path = "{0}/retry".format(self.endpoint.replace(":id", self.id))
         self.client.api_post(path)
 
+class Payout(Resource):
+    endpoint = "/payouts/:id"
+    date_fields = ["paid_at"]
 
 class User(Resource):
     endpoint = "/users/:id"

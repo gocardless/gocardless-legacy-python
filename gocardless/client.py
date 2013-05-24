@@ -7,7 +7,7 @@ from gocardless.utils import generate_signature, to_query, signature_valid
 from gocardless.request import Request
 from gocardless.exceptions import ClientError, SignatureError
 from gocardless.resources import (Merchant, Subscription, Bill,
-                                  PreAuthorization, User)
+                                  PreAuthorization, User, Payout)
 
 logger = logging.getLogger(__name__)
 
@@ -157,6 +157,12 @@ class Client(object):
         Find a bill with id `id`
         """
         return Bill.find_with_client(id, self)
+
+    def payout(self, id):
+        """
+        Find a payout with id `id`
+        """
+        return Payout.find_with_client(id, self)
 
     def create_bill(self, amount, pre_auth_id, name=None, description=None):
         """Creates a new bill under an existing pre_authorization
