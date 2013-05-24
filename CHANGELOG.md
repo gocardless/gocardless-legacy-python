@@ -1,3 +1,7 @@
+## 0.2.3 - May 24, 2013
+
+- Adds support for Payouts API
+
 ## 0.2.2 - April 16, 2013
 
 - Adds support for "retry" method on Bill, which allows a bill with status
@@ -10,7 +14,6 @@
 ## 0.1.5 - August 20, 2012
 
 - Remove hard-coded sandbox URL
->>>>>>> 4bba819cf0bebf7a06d879bd661c2ab782f60983
 
 ## 0.1.4 - August 20, 2012
 
