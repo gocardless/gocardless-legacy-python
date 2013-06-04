@@ -60,6 +60,7 @@ bill_json = json.loads("""
    "paid_at": null,
    "source_type": "pre_authorization",
    "source_id": "FAZ6FGSMTCOZUG",
+   "payout_id": "XXX",
    "uri": "https://gocardless.com/api/v1/bills/PWSDXRYSCOKA7Z"
 }""")
 

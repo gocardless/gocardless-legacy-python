@@ -104,7 +104,7 @@ class ClientTestCase(unittest.TestCase):
     def test_get_bill(self):
         self._get_resource_tester("bill", create_mock_attrs(
                 {"paid_at":datetime.datetime.now().isoformat()[:-7] + "Z",
-                "user_id":"someuserid"}))
+                "user_id":"someuserid", "payout_id": "XXX"}))
 
     def _get_resource_tester(self, resource_name, resource_fixture):
         expected_klass = getattr(sys.modules["gocardless.resources"], utils.camelize(resource_name))
