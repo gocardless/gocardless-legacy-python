@@ -212,14 +212,15 @@ class PreAuthBillCreationTestCase(unittest.TestCase):
         client = mock.Mock()
         client.api_post.return_value = fixtures.bill_json
         result = Bill.create_under_preauth(10, "1234", client, name="aname",
-                description="adesc")
+                description="adesc", charge_customer_at="2013-08-27")
         self.assertIsInstance(result, Bill)
         expected_params = {
                 "bill":{
                     "amount":10,
                     "pre_authorization_id":"1234",
                     "name":"aname",
-                    "description":"adesc"
+                    "description":"adesc",
+                    "charge_customer_at": "2013-08-27"
                     }
                 }
         client.api_post.assert_called_with("/bills", expected_params)
@@ -227,10 +228,11 @@ class PreAuthBillCreationTestCase(unittest.TestCase):
     @patch('gocardless.resources.Bill')
     def test_preauth_create_calls_bill_create(self, mock_bill_class):
        pre_auth = PreAuthorization(fixtures.preauth_json, None)
-       pre_auth.create_bill(10, name="aname", description="adesc")
+       pre_auth.create_bill(10, name="aname", description="adesc",
+                            charge_customer_at="2013-08-27")
        mock_bill_class.create_under_preauth.assert_called_with(10,
                pre_auth.id, None, name="aname",
-               description="adesc")
+               description="adesc", charge_customer_at="2013-08-27")
 
 class BillRetryTestCase(unittest.TestCase):
 
