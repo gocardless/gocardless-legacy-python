@@ -333,7 +333,7 @@ class Client(object):
             "resource_type": params["resource_type"],
         }
         auth_details = (self._app_id, self._app_secret)
-        self.api_post("/confirm", to_post, auth=auth_details)
+        return self.api_post("/confirm", to_post, auth=auth_details)
 
     def new_merchant_url(self, redirect_uri, state=None, merchant=None):
         """Get a URL for managing a new merchant
