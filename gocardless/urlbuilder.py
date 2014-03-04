@@ -134,7 +134,7 @@ class PreAuthorizationParams(object):
         self.calendar_intervals = None
         if calendar_intervals:
             self.calendar_intervals = calendar_intervals
-        self.currency = currency if currency else "GBP"
+        self.currency = currency if currency else None
 
     def to_dict(self):
         result = {}

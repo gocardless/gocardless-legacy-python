@@ -79,8 +79,8 @@ preauth_json = json.loads("""
    "remaining_amount": "65.0",
    "next_interval_start": "2012-02-20T00:00:00Z",
    "user_id": "834JUH8KLJ",
-   "max_amount":"70.0",
-   "currency":"GBP",
+   "max_amount": "70.0",
+   "currency": "GBP",
    "uri":"https://gocardless.com/api/v1/pre_authorizations/1609",
    "sub_resource_uris":{
       "bills":"https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/bills?source_id=1609"
