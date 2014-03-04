@@ -258,7 +258,7 @@ class Client(object):
                                  description=None, interval_count=None,
                                  calendar_intervals=None, redirect_uri=None,
                                  cancel_uri=None, state=None, user=None,
-                                 setup_fee=None):
+                                 setup_fee=None, currency=None):
         """Get a url for creating new pre_authorizations
 
         :param max_amount: A float which is the maximum amount for this
