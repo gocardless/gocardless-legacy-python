@@ -82,36 +82,36 @@ class BasicParams(object):
 
 
 class PreAuthorizationParams(object):
-
+ 
     def __init__(self, max_amount, merchant_id, interval_length,
                  interval_unit, expires_at=None, name=None, description=None,
                  interval_count=None, calendar_intervals=None, user=None,
-                 setup_fee=None):
-
+                 setup_fee=None, currency=None):
+ 
         self.merchant_id = merchant_id
         self.resource_name = "pre_authorizations"
-
+ 
         if user:
             self.user = user
-
+ 
         if not max_amount > 0:
             raise ValueError("""max_amount must be
                     positive value passed was {0}""".format(max_amount))
         self.max_amount = max_amount
         
         self.setup_fee = setup_fee
-
+ 
         if not interval_length > 0:
             raise ValueError("interval_length must be positive, value "
                              "passed was {0}".format(interval_length))
         self.interval_length = interval_length
-
+ 
         valid_units = ["month", "day", "week"]
         if interval_unit not in valid_units:
             message = "interval_unit must be one of {0}, value passed was {1}"
             raise ValueError(message.format(valid_units, interval_unit))
         self.interval_unit = interval_unit
-
+ 
         if expires_at:
             if (expires_at - datetime.datetime.now()).total_seconds() < 0:
                 time_str = expires_at.isoformat()
@@ -120,7 +120,7 @@ class PreAuthorizationParams(object):
             self.expires_at = expires_at
         else:
             self.expires_at = None
-
+ 
         if interval_count:
             if interval_count < 0:
                 raise ValueError("interval_count must be positive "
@@ -128,19 +128,21 @@ class PreAuthorizationParams(object):
             self.interval_count = interval_count
         else:
             self.interval_count = None
-
+ 
         self.name = name if name else None
         self.description = description if description else None
         self.calendar_intervals = None
         if calendar_intervals:
             self.calendar_intervals = calendar_intervals
-
+        self.currency = currency if currency else "GBP"
+ 
     def to_dict(self):
         result = {}
         attrnames = [
             "merchant_id", "name", "description", "interval_count",
             "interval_unit", "interval_length", "max_amount",
-            "calendar_intervals", "expires_at", "user", "setup_fee"
+            "calendar_intervals", "expires_at", "user", "setup_fee", 
+            "currency"
         ]
         for attrname in attrnames:
             val = getattr(self, attrname, None)
