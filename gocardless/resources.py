@@ -180,6 +180,19 @@ class Bill(Resource):
         path = "{0}/retry".format(self.endpoint.replace(":id", self.id))
         self.client.api_post(path)
 
+    def cancel(self):
+        path = "{0}/cancel".format(self.endpoint.replace(":id", self.id))
+        self.client.api_put(path)
+
+    """Please note the refund endpoint is disabled by default
+
+    If you have over 50 successful payments on your account and you 
+    require access to the refund endpoint, please email help@gocardless.com
+    """
+    def refund(self):
+        path = "{0}/refund".format(self.endpoint.replace(":id", self.id))
+        self.client.api_post(path)
+
 class Payout(Resource):
     endpoint = "/payouts/:id"
     date_fields = ["paid_at"]

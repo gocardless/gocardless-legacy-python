@@ -243,4 +243,16 @@ class BillRetryTestCase(unittest.TestCase):
         retry_url = "/bills/{0}/retry".format(fixtures.bill_json["id"])
         client.api_post.assert_called_with(retry_url)
 
+    def test_cancel_put(self):
+        client = mock.Mock()
+        bill = Bill(fixtures.bill_json, client)
+        bill.cancel()
+        cancel_url = "/bills/{0}/cancel".format(fixtures.bill_json["id"])
+        client.api_put.assert_called_with(cancel_url)
 
+    def test_refund_post(self):
+        client = mock.Mock()
+        bill = Bill(fixtures.bill_json, client)
+        bill.refund()
+        refund_url = "/bills/{0}/refund".format(fixtures.bill_json["id"])
+        client.api_post.assert_called_with(refund_url)
