@@ -232,7 +232,7 @@ class PreAuthBillCreationTestCase(unittest.TestCase):
                             charge_customer_at="2013-08-27")
        mock_bill_class.create_under_preauth.assert_called_with(10,
                pre_auth.id, None, name="aname",
-               description="adesc", charge_customer_at="2013-08-27")
+               description="adesc", charge_customer_at="2013-08-27", currency=None)
 
 class BillRetryTestCase(unittest.TestCase):
 
