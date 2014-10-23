@@ -143,10 +143,11 @@ class PreAuthorization(Resource):
     reference_fields = ["user_id", "merchant_id"]
 
     def create_bill(self, amount, name=None, description=None,
-                    charge_customer_at=None):
+                    charge_customer_at=None, currency=None):
         return Bill.create_under_preauth(amount, self.id, self.client,
                                          name=name, description=description,
-                                         charge_customer_at=charge_customer_at)
+                                         charge_customer_at=charge_customer_at,
+                                         currency=currency)
 
     def cancel(self):
         path = "{0}/cancel".format(self.endpoint.replace(":id", self.id))
@@ -160,7 +161,7 @@ class Bill(Resource):
 
     @classmethod
     def create_under_preauth(self, amount, pre_auth_id, client, name=None,
-                             description=None, charge_customer_at=None):
+                             description=None, charge_customer_at=None, currency=None):
         path = "/bills"
         params = {
             "bill": {
@@ -174,10 +175,25 @@ class Bill(Resource):
             params["bill"]["description"] = description
         if charge_customer_at:
             params["bill"]["charge_customer_at"] = charge_customer_at
+        if currency:
+            params["bill"]["currency"] = currency
         return Bill(client.api_post(path, params), client)
 
     def retry(self):
         path = "{0}/retry".format(self.endpoint.replace(":id", self.id))
+        self.client.api_post(path)
+
+    def cancel(self):
+        path = "{0}/cancel".format(self.endpoint.replace(":id", self.id))
+        self.client.api_put(path)
+
+    """Please note the refund endpoint is disabled by default
+
+    If you have over 50 successful payments on your account and you 
+    require access to the refund endpoint, please email help@gocardless.com
+    """
+    def refund(self):
+        path = "{0}/refund".format(self.endpoint.replace(":id", self.id))
         self.client.api_post(path)
 
 class Payout(Resource):
