@@ -1,6 +1,8 @@
 .. image:: https://s3-eu-west-1.amazonaws.com/gocardless/images/client-lib-headers/python-lib-header.png
   :target: https://gocardless.com/docs?language=python
 
+[![Build Status](https://secure.travis-ci.org/gocardless/gocardless-python.png?branch=master)](http://travis-ci.org/gocardless/gocardless-python)
+
 This module provides a wrapper around the GoCardless payments API, the
 interface to the api is provided by the `gocardless.Client` object. See the
 documentation for that class for how to obtain an instance.
