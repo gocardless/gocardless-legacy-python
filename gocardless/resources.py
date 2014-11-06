@@ -143,10 +143,11 @@ class PreAuthorization(Resource):
     reference_fields = ["user_id", "merchant_id"]
 
     def create_bill(self, amount, name=None, description=None,
-                    charge_customer_at=None):
+                    charge_customer_at=None, currency=None):
         return Bill.create_under_preauth(amount, self.id, self.client,
                                          name=name, description=description,
-                                         charge_customer_at=charge_customer_at)
+                                         charge_customer_at=charge_customer_at,
+                                         currency=currency)
 
     def cancel(self):
         path = "{0}/cancel".format(self.endpoint.replace(":id", self.id))
@@ -160,7 +161,7 @@ class Bill(Resource):
 
     @classmethod
     def create_under_preauth(self, amount, pre_auth_id, client, name=None,
-                             description=None, charge_customer_at=None):
+                             description=None, charge_customer_at=None, currency=None):
         path = "/bills"
         params = {
             "bill": {
@@ -174,6 +175,8 @@ class Bill(Resource):
             params["bill"]["description"] = description
         if charge_customer_at:
             params["bill"]["charge_customer_at"] = charge_customer_at
+        if currency:
+            params["bill"]["currency"] = currency
         return Bill(client.api_post(path, params), client)
 
     def retry(self):

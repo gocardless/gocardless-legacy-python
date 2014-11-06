@@ -1,3 +1,11 @@
+## 0.3.1 - Mar 4, 2014
+
+- Adds option to pass in currency field
+
+## 0.3.0 - Aug 23, 2013
+
+- Adds option to pass in charge_customer_at field
+
 ## 0.2.3 - May 24, 2013
 
 - Adds support for Payouts API

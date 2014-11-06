@@ -21,7 +21,7 @@ style API. For example, to get all of a merchants bills:
     >>> [<gocardless.resources.Bill at 0x29a6050>]
 """
 
-VERSION = (0, 3, 0)
+VERSION = (0, 3, 1)
 
 def get_version():
     return '.'.join(str(part) for part in VERSION)

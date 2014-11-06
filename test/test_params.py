@@ -86,6 +86,7 @@ class PreAuthParamsToDictTestCase(unittest.TestCase):
                 "name":"aname",
                 "description":"adesc",
                 "interval_count":123,
+                "currency":"GBP",
                 "expires_at":datetime.datetime.strptime("2020-01-01", "%Y-%m-%d"),
                 "calendar_intervals":True
                 }

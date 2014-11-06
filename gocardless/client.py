@@ -164,7 +164,7 @@ class Client(object):
         """
         return Payout.find_with_client(id, self)
 
-    def create_bill(self, amount, pre_auth_id, name=None, description=None):
+    def create_bill(self, amount, pre_auth_id, name=None, description=None, currency=None):
         """Creates a new bill under an existing pre_authorization
 
         :param amount: The amount to bill
@@ -175,13 +175,13 @@ class Client(object):
 
         """
         return Bill.create_under_preauth(amount, pre_auth_id, self,
-                                         name=name, description=description)
+                                         name=name, description=description, currency=currency)
 
     def new_subscription_url(self, amount, interval_length, interval_unit,
                              name=None, description=None, interval_count=None,
                              start_at=None, expires_at=None, redirect_uri=None,
                              cancel_uri=None, state=None, user=None,
-                             setup_fee=None):
+                             setup_fee=None, currency=None):
         """Generate a url for creating a new subscription
 
         :param amount: The amount to charge each time
@@ -213,13 +213,15 @@ class Client(object):
 
         :param setup_fee: A one off payment which will be taken at the start
           of the subscription.
+        :param currency: 3 letter currency code for the payment to be taken in.
+          Defaults to GBP.
         """
         params = urlbuilder.SubscriptionParams(
             amount, self._merchant_id,
             interval_length, interval_unit, name=name,
             description=description, interval_count=interval_count,
             expires_at=expires_at, start_at=start_at, user=user,
-            setup_fee=setup_fee
+            setup_fee=setup_fee, currency=currency
         )
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri,
@@ -227,7 +229,7 @@ class Client(object):
 
     def new_bill_url(self, amount, name=None, description=None,
                      redirect_uri=None, cancel_uri=None, state=None,
-                     user=None):
+                     user=None, currency=None):
         """Generate a url for creating a new bill
 
         :param amount: The amount to bill the customer
@@ -245,10 +247,12 @@ class Client(object):
           - `last_name`
           - `email`
 
-
+        :param currency: 3 letter currency code for the payment to be taken in.
+          Defaults to GBP.
         """
         params = urlbuilder.BillParams(amount, self._merchant_id, name=name,
-                                       description=description, user=user)
+                                       description=description, user=user,
+                                       currency=currency)
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri,
                                       cancel_uri=cancel_uri, state=state)
@@ -258,7 +262,7 @@ class Client(object):
                                  description=None, interval_count=None,
                                  calendar_intervals=None, redirect_uri=None,
                                  cancel_uri=None, state=None, user=None,
-                                 setup_fee=None):
+                                 setup_fee=None, currency=None):
         """Get a url for creating new pre_authorizations
 
         :param max_amount: A float which is the maximum amount for this
@@ -294,13 +298,15 @@ class Client(object):
           - `email`
         :param setup_fee: A one off payment which will be taken at the start
           of the subscription.
-
+        :param currency: 3 letter currency code for the payment to be taken in.
+          Defaults to GBP.
         """
         params = urlbuilder.PreAuthorizationParams(
             max_amount, self._merchant_id, interval_length, interval_unit,
             expires_at=expires_at, name=name, description=description,
             interval_count=interval_count, user=user,
-            calendar_intervals=calendar_intervals, setup_fee=setup_fee
+            calendar_intervals=calendar_intervals, setup_fee=setup_fee,
+            currency=currency
         )
         builder = urlbuilder.UrlBuilder(self)
         return builder.build_and_sign(params, redirect_uri=redirect_uri,

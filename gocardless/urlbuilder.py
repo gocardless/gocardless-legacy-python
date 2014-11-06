@@ -55,7 +55,7 @@ class UrlBuilder(object):
 class BasicParams(object):
 
     def __init__(self, amount, merchant_id, name=None, description=None,
-                 user=None):
+                 user=None, currency=None):
         if not amount > 0:
             raise ValueError("amount must be positive, value passed was"
                              " {0}".format(amount))
@@ -70,7 +70,12 @@ class BasicParams(object):
 
         if description:
             self.description = description
-        self.attrnames = ["amount", "name", "description", "merchant_id", "user"]
+
+        if currency:
+            self.currency = currency
+        self.attrnames = [
+            "amount", "name", "description", "merchant_id", "user", "currency"
+        ]
 
     def to_dict(self):
         result = {}
@@ -86,7 +91,7 @@ class PreAuthorizationParams(object):
     def __init__(self, max_amount, merchant_id, interval_length,
                  interval_unit, expires_at=None, name=None, description=None,
                  interval_count=None, calendar_intervals=None, user=None,
-                 setup_fee=None):
+                 setup_fee=None, currency=None):
 
         self.merchant_id = merchant_id
         self.resource_name = "pre_authorizations"
@@ -98,7 +103,7 @@ class PreAuthorizationParams(object):
             raise ValueError("""max_amount must be
                     positive value passed was {0}""".format(max_amount))
         self.max_amount = max_amount
-        
+
         self.setup_fee = setup_fee
 
         if not interval_length > 0:
@@ -134,13 +139,15 @@ class PreAuthorizationParams(object):
         self.calendar_intervals = None
         if calendar_intervals:
             self.calendar_intervals = calendar_intervals
+        self.currency = currency if currency else None
 
     def to_dict(self):
         result = {}
         attrnames = [
             "merchant_id", "name", "description", "interval_count",
             "interval_unit", "interval_length", "max_amount",
-            "calendar_intervals", "expires_at", "user", "setup_fee"
+            "calendar_intervals", "expires_at", "user", "setup_fee", 
+            "currency"
         ]
         for attrname in attrnames:
             val = getattr(self, attrname, None)
@@ -152,9 +159,10 @@ class PreAuthorizationParams(object):
 class BillParams(BasicParams):
 
     def __init__(self, amount, merchant_id, name=None, description=None,
-                 user=None):
+                 user=None, currency=None):
         BasicParams.__init__(self, amount, merchant_id, name=name,
-                             user=user, description=description)
+                             user=user, description=description, 
+                             currency=currency)
         self.resource_name = "bills"
 
 
@@ -162,7 +170,8 @@ class SubscriptionParams(BasicParams):
 
     def __init__(self, amount, merchant_id, interval_length, interval_unit,
                  name=None, description=None, start_at=None, expires_at=None,
-                 interval_count=None, user=None, setup_fee=None):
+                 interval_count=None, user=None, setup_fee=None, 
+                 currency=None):
         BasicParams.__init__(self, amount, merchant_id, user=user,
                              description=description, name=name)
         self.resource_name = "subscriptions"
@@ -200,10 +209,12 @@ class SubscriptionParams(BasicParams):
         self.name = name if name else None
         self.description = description if description else None
         self.setup_fee = setup_fee
+        self.currency = currency if currency else None
 
         self.attrnames.extend([
             "description", "interval_count", "interval_unit",
-            "interval_length", "expires_at", "start_at", "setup_fee"
+            "interval_length", "expires_at", "start_at", "setup_fee", 
+            "currency"
         ])
 
     def check_date_in_future(self, date, argname):

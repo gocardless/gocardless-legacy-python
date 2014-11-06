@@ -13,6 +13,7 @@ merchant_json = json.loads("""{
    "pending_balance": "0.00",
    "next_payout_date": "2011-11-25T17:07:09Z",
    "next_payout_amount": "12.00",
+   "currency": "GBP",
    "sub_resource_uris": {
       "users": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/users",
       "bills": "https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/bills",
@@ -37,6 +38,7 @@ subscription_json = json.loads("""
    "merchant_id":"WOQRUJU9OH2HH1",
    "status":"active",
    "user_id":"HJEH638AJD",
+   "currency": "GBP",
    "uri":"https://gocardless.com/api/v1/subscriptions/1580",
    "sub_resource_uris":{
       "bills":"https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/bills?source_id=1580"
@@ -61,6 +63,7 @@ bill_json = json.loads("""
    "source_type": "pre_authorization",
    "source_id": "FAZ6FGSMTCOZUG",
    "payout_id": "XXX",
+   "currency": "GBP",
    "uri": "https://gocardless.com/api/v1/bills/PWSDXRYSCOKA7Z"
 }""")
 
@@ -79,7 +82,8 @@ preauth_json = json.loads("""
    "remaining_amount": "65.0",
    "next_interval_start": "2012-02-20T00:00:00Z",
    "user_id": "834JUH8KLJ",
-   "max_amount":"70.0",
+   "max_amount": "70.0",
+   "currency": "GBP",
    "uri":"https://gocardless.com/api/v1/pre_authorizations/1609",
    "sub_resource_uris":{
       "bills":"https://gocardless.com/api/v1/merchants/WOQRUJU9OH2HH1/bills?source_id=1609"

@@ -446,7 +446,7 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
                 3, 7, "day", expires_at=datetime.datetime.now(),
                 name="aname", description="desc", interval_count=5,
                 calendar_intervals=False, user={"somekey":"somval"},
-                setup_fee=None)
+                setup_fee=None, currency=None)
 
     def test_new_pre_auth_params_constructor(self):
         self.params_argument_check("new_pre_authorization_url",
@@ -454,7 +454,7 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
                 3, 7, "day", expires_at=datetime.datetime.now(),
                 name="aname", description="desc", interval_count=5,
                 calendar_intervals=False, user={"somekey":"somval"},
-                setup_fee=None)
+                setup_fee=None, currency=None)
 
     def test_new_bill_calls_urlbuilder(self):
         self.urlbuilder_argument_check("new_bill_url",
@@ -465,7 +465,7 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
         self.params_argument_check("new_bill_url",
                 urlbuilder.BillParams,
                 10, name="aname", user={"key":"val"},
-                description="adesc")
+                description="adesc", currency=None)
 
     def test_new_subscription_calls_urlbuilder(self):
         self.urlbuilder_argument_check("new_subscription_url",
@@ -478,6 +478,7 @@ class ClientUrlBuilderTestCase(unittest.TestCase):
                 10, 23, "day", name="name", description="adesc",
                 start_at=datetime.datetime.now(),
                 expires_at=datetime.datetime.now() + datetime.timedelta(100),
-                interval_count=20, user={"key":"val"}, setup_fee=20)
+                interval_count=20, user={"key":"val"}, setup_fee=20,
+                currency=None)
 
 
