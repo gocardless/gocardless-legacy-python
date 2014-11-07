@@ -5,7 +5,7 @@ DESCRIPTION = "The Python client library for the GoCardless API"
 
 LONG_DESCRIPTION = None
 try:
-    LONG_DESCRIPTION = open('README.rst').read()
+    LONG_DESCRIPTION = open('README.md').read()
 except:
     pass
 
