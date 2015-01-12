@@ -98,6 +98,13 @@ class ResourceSubresourceTestCase(unittest.TestCase):
             self.assertIsInstance(res, TestSubResource)
         self.assertEqual(set([1,2]), set([item.id for item in result]))
 
+    def test_resource_can_query_subresource_with_params(self):
+        mock_client = mock.Mock()
+        mock_client.api_get.return_value = [create_mock_attrs({"id":"1"})]
+        self.resource.client = mock_client
+        result = self.resource.test_sub_resources(foo='bar')
+        mock_client.api_get.assert_called_with(mock.ANY, params={'foo': 'bar'})
+
     def test_resource_is_correct_instance(self):
         """
         Expose an issue where the closure which creates sub_resource functions

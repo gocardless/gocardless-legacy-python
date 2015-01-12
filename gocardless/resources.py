@@ -62,8 +62,8 @@ class Resource(object):
                     # creator, see
                     # http://stackoverflow.com/questions/233673/
                     #         lexical-closures-in-python/235764#235764
-                    def get_resources(inst):
-                        data = inst.client.api_get(the_path)
+                    def get_resources(inst, **params):
+                        data = inst.client.api_get(the_path, params=params)
                         return [the_klass(attrs, self.client) for attrs in data]
                     return get_resources
                 res_func = create_get_resource_func(path, sub_klass)
@@ -189,7 +189,7 @@ class Bill(Resource):
 
     """Please note the refund endpoint is disabled by default
 
-    If you have over 50 successful payments on your account and you 
+    If you have over 50 successful payments on your account and you
     require access to the refund endpoint, please email help@gocardless.com
     """
     def refund(self):

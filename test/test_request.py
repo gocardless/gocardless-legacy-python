@@ -47,6 +47,15 @@ class RequestTestCase(unittest.TestCase):
         mock_requests.get.assert_called_once_with(mock.ANY, headers=mock.ANY)
 
     @mock.patch('gocardless.request.requests')
+    def test_perform_passes_params_through(self, mock_requests):
+        params = {'x': 'y'}
+        request = gocardless.request.Request('get', 'http://test.com', params)
+        mock_requests.get.return_value.content = '{"a": "b"}'
+        request.perform()
+        mock_requests.get.assert_called_once_with(mock.ANY, headers=mock.ANY,
+                                                  params=params)
+
+    @mock.patch('gocardless.request.requests')
     def test_perform_calls_post_for_posts(self, mock_requests):
         mock_requests.post.return_value.content = '{"a": "b"}'
         self.request._method = 'post'
