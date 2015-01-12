@@ -1,3 +1,8 @@
+## 0.4.0 - Jan 12, 2015
+
+- Support passing query parameters in to subresource accessors (e.g.
+  `merchant.bills(per_page=10)`)
+
 ## 0.3.1 - Mar 4, 2014
 
 - Adds option to pass in currency field
