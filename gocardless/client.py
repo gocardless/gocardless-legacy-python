@@ -62,13 +62,14 @@ class Client(object):
         if merchant_id:
             self._merchant_id = merchant_id
 
-    def api_get(self, path, **kwargs):
+    def api_get(self, path, params=None, **kwargs):
         """
         Issue an GET request to the API server.
 
         :param path: the path that will be added to the API prefix
+        :param params: query string parameters
         """
-        return self._request('get', API_PATH + path, **kwargs)
+        return self._request('get', API_PATH + path, params=params, **kwargs)
 
     def api_post(self, path, data, **kwargs):
         """Issue a POST request to the API server
@@ -92,7 +93,6 @@ class Client(object):
         """Issue a delete to the API server.
 
         :param path: the path that will be added to the API prefix
-        :param params: query string parameters
         """
         return self._request('delete', API_PATH + path, **kwargs)
 
@@ -104,7 +104,7 @@ class Client(object):
         :param path: the path fragment of the URL
         """
         request_url = self.get_base_url() + path
-        request = Request(method, request_url)
+        request = Request(method, request_url, params=kwargs.get("params"))
         logger.debug("Executing request to {0}".format(request_url))
 
         if 'auth' in kwargs:

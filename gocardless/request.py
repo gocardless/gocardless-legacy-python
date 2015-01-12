@@ -5,7 +5,7 @@ import requests
 
 class Request(object):
 
-    def __init__(self, method, url):
+    def __init__(self, method, url, params=None):
         self._method = method
         self._url = url
         headers = {}
@@ -13,6 +13,9 @@ class Request(object):
         lib_version = gocardless.get_version()
         headers["User-Agent"] = "gocardless-python/{0}".format(lib_version)
         self._opts = {"headers": headers}
+
+        if params is not None:
+            self._opts["params"] = params
 
         if not self._valid_method(method):
             raise ValueError('Invalid method {0}'.format(method))
