@@ -1,7 +1,7 @@
 import base64
 import datetime
 import os
-import utils
+from . import utils
 
 
 class UrlBuilder(object):
@@ -106,6 +106,7 @@ class PreAuthorizationParams(object):
 
         self.setup_fee = setup_fee
 
+        interval_length = int(interval_length)
         if not interval_length > 0:
             raise ValueError("interval_length must be positive, value "
                              "passed was {0}".format(interval_length))
@@ -146,7 +147,7 @@ class PreAuthorizationParams(object):
         attrnames = [
             "merchant_id", "name", "description", "interval_count",
             "interval_unit", "interval_length", "max_amount",
-            "calendar_intervals", "expires_at", "user", "setup_fee", 
+            "calendar_intervals", "expires_at", "user", "setup_fee",
             "currency"
         ]
         for attrname in attrnames:
@@ -161,7 +162,7 @@ class BillParams(BasicParams):
     def __init__(self, amount, merchant_id, name=None, description=None,
                  user=None, currency=None):
         BasicParams.__init__(self, amount, merchant_id, name=name,
-                             user=user, description=description, 
+                             user=user, description=description,
                              currency=currency)
         self.resource_name = "bills"
 
@@ -170,13 +171,14 @@ class SubscriptionParams(BasicParams):
 
     def __init__(self, amount, merchant_id, interval_length, interval_unit,
                  name=None, description=None, start_at=None, expires_at=None,
-                 interval_count=None, user=None, setup_fee=None, 
+                 interval_count=None, user=None, setup_fee=None,
                  currency=None):
         BasicParams.__init__(self, amount, merchant_id, user=user,
                              description=description, name=name)
         self.resource_name = "subscriptions"
         self.merchant_id = merchant_id
 
+        interval_length = int(interval_length)
         if not interval_length > 0:
             raise ValueError("interval_length must be positive, value "
                              "passed was {0}".format(interval_length))
@@ -213,7 +215,7 @@ class SubscriptionParams(BasicParams):
 
         self.attrnames.extend([
             "description", "interval_count", "interval_unit",
-            "interval_length", "expires_at", "start_at", "setup_fee", 
+            "interval_length", "expires_at", "start_at", "setup_fee",
             "currency"
         ])
 
