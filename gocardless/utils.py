@@ -3,10 +3,7 @@ import hmac
 import re
 
 import six
-try:
-    from urllib import quote
-except ImportError:
-    from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import quote
 
 
 def percent_encode(string):
