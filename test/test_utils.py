@@ -2,6 +2,7 @@
 
 import unittest
 import six
+import codecs
 
 
 from gocardless import utils
@@ -25,10 +26,10 @@ class PercentEncodeTestCase(unittest.TestCase):
       self.assertEqual(utils.percent_encode(six.u("-._~")), six.u("-._~"))
 
     def test_encodes_non_ascii_alpha_characters(self):
-      if six.PY2:
-          original = u"å"
-      else:
+      if six.PY3:
           original = "å"
+      else:
+          original = codecs.lookup('utf-8').decode("å")[0]
       self.assertEqual(utils.percent_encode(original), six.u("%C3%A5"))
 
     def test_encodes_reserved_ascii_characters(self):
@@ -40,10 +41,10 @@ class PercentEncodeTestCase(unittest.TestCase):
                        six.u("%3C%3D%3E%3F%40%5B%5C%5D%5E%60"))
 
     def test_encodes_other_non_ascii_characters(self):
-      if six.PY2:
-          original = u"支払い"
-      else:
+      if six.PY3:
           original = "支払い"
+      else:
+          original = codecs.lookup('utf-8').decode("支払い")[0]
       self.assertEqual(utils.percent_encode(original),
                        six.u("%E6%94%AF%E6%89%95%E3%81%84"))
 
