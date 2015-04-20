@@ -119,6 +119,9 @@ class Client(object):
         if type(response) == dict and "errors" in response.keys():
             raise ClientError("Error calling api, message was {0}".format(
                 response["errors"]))
+        if type(response) == dict and "error" in response.keys():
+            raise ClientError("Error calling api, message was {0}".format(
+                response["error"]))
         return response
 
     def merchant(self):
