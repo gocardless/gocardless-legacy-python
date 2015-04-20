@@ -116,9 +116,9 @@ class Client(object):
 
         request.set_payload(kwargs.get('data'))
         response = request.perform()
-        if type(response) == dict and "error" in response.keys():
+        if type(response) == dict and "errors" in response.keys():
             raise ClientError("Error calling api, message was {0}".format(
-                response["error"]))
+                response["errors"]))
         return response
 
     def merchant(self):

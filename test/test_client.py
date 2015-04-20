@@ -46,7 +46,7 @@ class ClientTestCase(unittest.TestCase):
     def test_error_raises_clienterror(self):
         with patch('gocardless.clientlib.Request') as mock_request_module:
             mock_request = mock.Mock()
-            mock_request.perform.return_value = {"error":"anerrormessage"}
+            mock_request.perform.return_value = {"errors":"anerrormessage"}
             mock_request_module.return_value = mock_request
             with self.assertRaises(ClientError) as ex:
                 self.client.api_get("/somepath")
