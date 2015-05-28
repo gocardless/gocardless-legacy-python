@@ -29,7 +29,7 @@ def get_version():
 from .client import Client
 
 #import as clientlib so that we don't shadow with the client variable
-import client as clientlib
+from . import client as clientlib
 from gocardless.resources import (Bill, Subscription, PreAuthorization, User,
                                   Merchant)
 
