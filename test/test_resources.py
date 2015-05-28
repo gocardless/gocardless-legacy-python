@@ -5,9 +5,12 @@ import mock
 from mock import patch
 import unittest
 
-import fixtures
+import six
+
+from . import fixtures
 import gocardless
 from gocardless.resources import Resource, Subscription, Bill, PreAuthorization
+import collections
 
 
 class TestResource(Resource):
@@ -53,7 +56,7 @@ class ResourceTestCase(unittest.TestCase):
                 "key3":"three",
                 "id":"1"}
         res = TestResource(attrs.copy(), None)
-        for key, value in attrs.items():
+        for key, value in six.iteritems(attrs):
             self.assertEqual(getattr(res, key), value)
 
     def test_resource_created_at_is_date(self):
@@ -86,10 +89,10 @@ class ResourceSubresourceTestCase(unittest.TestCase):
 
     def test_resource_lists_subresources(self):
         self.assertTrue(hasattr(self.resource, "test_sub_resources"))
-        self.assertTrue(callable(getattr(self.resource, "test_sub_resources")))
+        self.assertTrue(isinstance(getattr(self.resource, "test_sub_resources"), collections.Callable))
 
     def test_resource_subresource_returns_subresource_instances(self):
-        mock_return = map(create_mock_attrs, [{"id":1},{"id":2}])
+        mock_return = list(map(create_mock_attrs, [{"id":1},{"id":2}]))
         mock_client = mock.Mock()
         mock_client.api_get.return_value = mock_return
         self.resource.client = mock_client

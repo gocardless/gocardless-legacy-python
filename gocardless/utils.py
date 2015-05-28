@@ -1,26 +1,28 @@
-import urllib
 import hashlib
 import hmac
 import re
 
+import six
+from six.moves.urllib.parse import quote
+
 
 def percent_encode(string):
     """A version of urllibs' quote which correctly quotes '~'"""
-    return urllib.quote(string.encode('utf-8'), '~')
+    return quote(string.encode('utf-8'), '~')
 
 
 def to_query(obj, ns=None):
     """Create a query string from a list or dictionary"""
     if isinstance(obj, dict):
-        pairs = sum((to_query(v, u"{0}[{1}]".format(ns, k) if ns else k)
-                     for k, v in obj.items()), [])
+        pairs = sum((to_query(v, six.u("{0}[{1}]".format(ns, k)) if ns else k)
+                     for k, v in six.iteritems(obj)), [])
         if ns:
             return pairs
-        return u"&".join(u"{0}={1}".format(*p) for p in sorted(pairs))
+        return "&".join(six.u("{0}={1}".format(*p)) for p in sorted(pairs))
     elif isinstance(obj, (list, tuple)):
-        return sum((to_query(v, u"{0}[]".format(ns)) for v in obj), [])
+        return sum((to_query(v, six.u("{0}[]".format(ns))) for v in obj), [])
     else:
-        return [(percent_encode(unicode(ns)), percent_encode(unicode(obj)))]
+        return [(percent_encode(six.text_type(ns)), percent_encode(six.text_type(obj)))]
 
 
 def generate_signature(data, secret):
@@ -29,7 +31,9 @@ def generate_signature(data, secret):
     and your application's secret, returning a HMAC-SHA256
     digest of the data.
     """
-    return hmac.new(secret, to_query(data), hashlib.sha256).hexdigest()
+    return hmac.new(six.b(secret),
+                    msg=six.b(to_query(data)),
+                    digestmod=hashlib.sha256).hexdigest()
 
 
 def signature_valid(data, secret):

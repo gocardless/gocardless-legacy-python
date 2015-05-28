@@ -1,11 +1,12 @@
 import datetime
 import re
 import sys
-import types
 
-import utils
+from . import utils
 import gocardless
 from gocardless.exceptions import ClientError
+
+import six
 
 
 class ResourceMetaClass(type):
@@ -18,6 +19,7 @@ class ResourceMetaClass(type):
         return type.__new__(meta, name, bases, attrs)
 
 
+@six.add_metaclass(ResourceMetaClass)
 class Resource(object):
     """A GoCardless resource
 
@@ -33,7 +35,6 @@ class Resource(object):
     resources and will be converted into functions which can be called to
     retrieve those resources.
     """
-    __metaclass__ = ResourceMetaClass
 
     date_fields = ["created_at"]
     reference_fields = []
@@ -53,7 +54,7 @@ class Resource(object):
             #For each subresource_uri create a method which grabs data
             #from the URI and uses it to instantiate the relevant class
             #and return it.
-            for name, uri in attrs.pop("sub_resource_uris").items():
+            for name, uri in six.iteritems(attrs.pop("sub_resource_uris")):
                 path = re.sub(".*/api/v1", "", uri)
                 sub_klass = self._get_klass_from_name(name)
                 def create_get_resource_func(the_path, the_klass):
@@ -70,7 +71,7 @@ class Resource(object):
                 func_name = "{0}".format(name)
                 res_func.name = func_name
                 setattr(self, func_name,
-                        types.MethodType(res_func, self, self.__class__))
+                        six.create_bound_method(res_func, self))
 
         for fieldname in self.date_fields:
             val = attrs.pop(fieldname)
@@ -89,9 +90,9 @@ class Resource(object):
             name = fieldname.replace("_id", "")
             klass = self._get_klass_from_name(name)
             func = create_get_func(klass, id)
-            setattr(self, name, types.MethodType(func, self, self.__class__))
+            setattr(self, name, six.create_bound_method(func, self))
 
-        for key, value in attrs.items():
+        for key, value in six.iteritems(attrs):
             setattr(self, key, value)
 
     def _get_klass_from_name(self, name):
@@ -189,7 +190,7 @@ class Bill(Resource):
 
     """Please note the refund endpoint is disabled by default
 
-    If you have over 50 successful payments on your account and you 
+    If you have over 50 successful payments on your account and you
     require access to the refund endpoint, please email help@gocardless.com
     """
     def refund(self):

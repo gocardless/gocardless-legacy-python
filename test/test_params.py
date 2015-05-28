@@ -1,7 +1,9 @@
 import datetime
 import mock
 import unittest
-import urlparse
+
+import six
+from six.moves import urllib
 
 import gocardless
 from gocardless import utils, urlbuilder
@@ -103,13 +105,13 @@ class PreAuthParamsToDictTestCase(unittest.TestCase):
         return pa
 
     def assert_inverse(self, keys):
-        params = dict([[k,v] for k,v in self.all_params.items() \
+        params = dict([[k,v] for k,v in six.iteritems(self.all_params) \
                 if k in keys])
         pa = self.create_from_params_dict(params)
         self.assertEqual(params, pa.to_dict())
 
     def test_to_dict_all_params(self):
-        self.assert_inverse(self.all_params.keys())
+        self.assert_inverse(list(self.all_params.keys()))
 
     def test_to_dict_only_required(self):
         self.assert_inverse(self.required_keys)

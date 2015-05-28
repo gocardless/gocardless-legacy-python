@@ -56,7 +56,7 @@ class RequestTestCase(unittest.TestCase):
     @mock.patch('gocardless.request.requests.get')
     def test_perform_decodes_json(self, mock_get):
         response = mock.Mock()
-        response.content = '{"a": "b"}'
+        response.json = lambda: {"a": "b"}
         mock_get.return_value = response
         self.assertEqual(self.request.perform(), {'a': 'b'})
 
