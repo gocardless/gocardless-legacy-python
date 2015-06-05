@@ -1,3 +1,7 @@
+## 0.5.0 - May 28, 2015
+
+- Python 3 support
+
 ## 0.4.0 - Jan 12, 2015
 
 - Support passing query parameters in to subresource accessors (e.g.

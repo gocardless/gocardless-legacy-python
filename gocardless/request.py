@@ -40,5 +40,5 @@ class Request(object):
     def perform(self):
         fetch_func = getattr(requests, self._method)
         response = fetch_func(self._url, **self._opts)
-        return json.loads(response.content)
+        return response.json()
 

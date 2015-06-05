@@ -21,7 +21,7 @@ style API. For example, to get all of a merchants bills:
     >>> [<gocardless.resources.Bill at 0x29a6050>]
 """
 
-VERSION = (0, 4, 0)
+VERSION = (0, 5, 0)
 
 def get_version():
     return '.'.join(str(part) for part in VERSION)
@@ -29,7 +29,7 @@ def get_version():
 from .client import Client
 
 #import as clientlib so that we don't shadow with the client variable
-import client as clientlib
+from . import client as clientlib
 from gocardless.resources import (Bill, Subscription, PreAuthorization, User,
                                   Merchant)
 

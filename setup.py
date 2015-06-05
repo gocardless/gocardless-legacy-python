@@ -37,6 +37,6 @@ setup(
     long_description=LONG_DESCRIPTION,
     platforms=['any'],
     classifiers=CLASSIFIERS,
-    install_requires=['requests'],
+    install_requires=['requests>=1.0.0', 'six>=1.9.0'],
     test_suite='test',
 )

@@ -7,15 +7,17 @@ from mock import patch
 import os
 import sys
 import time
-import urlparse
 
-import fixtures
+import six
+from six.moves import urllib
+
+from . import fixtures
 import gocardless
 import gocardless.client
 from gocardless.client import Client
 from gocardless import utils, urlbuilder, resources
 from gocardless.exceptions import SignatureError, ClientError
-from test_resources import create_mock_attrs
+from .test_resources import create_mock_attrs
 
 mock_account_details = {
     'app_id': 'id01',
@@ -33,8 +35,8 @@ def create_mock_client(details):
 
 
 def get_url_params(url):
-    param_dict = urlparse.parse_qs(urlparse.urlparse(url).query)
-    return dict([[k,v[0]] for k,v in param_dict.items()])
+    param_dict = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+    return dict([[k,v[0]] for k,v in six.iteritems(param_dict)])
 
 
 class ClientTestCase(unittest.TestCase):
@@ -51,8 +53,8 @@ class ClientTestCase(unittest.TestCase):
             mock_request_module.return_value = mock_request
             with self.assertRaises(ClientError) as ex:
                 self.client.api_get("/somepath")
-            self.assertEqual(ex.exception.message, "Error calling api, message"
-                " was anerrormessage")
+                self.assertEqual(six.text_type(ex), "Error calling api, message"
+                    " was anerrormessage")
 
     def test_error_raises_clienterror_list(self):
         with patch('gocardless.clientlib.Request') as mock_request_module:
@@ -234,8 +236,8 @@ class UrlBuilderTestCase(unittest.TestCase):
         return mock_params
 
     def get_url_params(self, url):
-        param_dict = urlparse.parse_qs(urlparse.urlparse(url).query)
-        return dict([[k,v[0]] for k,v in param_dict.items()])
+        param_dict = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+        return dict([[k,v[0]] for k,v in six.iteritems(param_dict)])
 
     def test_urlbuilder_url_contains_correct_parameters(self):
         params = self.make_mock_params({"resource_name": "bill",
@@ -243,7 +245,7 @@ class UrlBuilderTestCase(unittest.TestCase):
                     "merchant_id":"merchid"})
         url = self.urlbuilder.build_and_sign(params)
         urlparams = get_url_params(url)
-        for k,v in params.to_dict().items():
+        for k,v in six.iteritems(params.to_dict()):
             if k == "resource_name":
                 continue
             self.assertEqual(urlparams["bill[{0}]".format(k)], str(v))
@@ -253,7 +255,7 @@ class UrlBuilderTestCase(unittest.TestCase):
                 "amount":20.0})
         url = self.urlbuilder.build_and_sign(params)
         urlparams = get_url_params(url)
-        self.assertTrue(urlparams.has_key("bill[amount]"))
+        self.assertTrue("bill[amount]" in urlparams)
 
 
     def test_add_merchant_id_to_limit(self):
@@ -304,7 +306,7 @@ class UrlBuilderTestCase(unittest.TestCase):
     def test_url_contains_resource_name(self):
         params = self.make_mock_params({"resource_name" : "pre_authorizations"})
         url = self.urlbuilder.build_and_sign(params)
-        path = urlparse.urlparse(url).path
+        path = urllib.parse.urlparse(url).path
         self.assertEqual(path, "/connect/pre_authorizations/new")
 
     def test_url_contains_timestamp(self):

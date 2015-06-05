@@ -2,12 +2,14 @@ import base64
 import logging
 
 import gocardless
-import urlbuilder
+from gocardless import urlbuilder
 from gocardless.utils import generate_signature, to_query, signature_valid
 from gocardless.request import Request
 from gocardless.exceptions import ClientError, SignatureError
 from gocardless.resources import (Merchant, Subscription, Bill,
                                   PreAuthorization, User, Payout)
+
+import six
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +124,6 @@ class Client(object):
         if type(response) == dict and "error" in response.keys():
             raise ClientError("Error calling api, message was ",
                 response["error"])
-
         return response
 
     def merchant(self):
@@ -332,12 +333,12 @@ class Client(object):
         - state (if any)
         """
         keys = ["resource_uri", "resource_id", "resource_type", "state"]
-        to_check = dict([[k, v] for k, v in params.items() if k in keys])
+        to_check = dict([[k, v] for k, v in six.iteritems(params) if k in keys])
         signature = generate_signature(to_check, self._app_secret)
         if not signature == params["signature"]:
             raise SignatureError("Invalid signature when confirming resource")
-        auth_string = base64.b64encode("{0}:{1}".format(
-            self._app_id, self._app_secret))
+        auth_string = base64.b64encode(six.b("{0}:{1}".format(
+            self._app_id, self._app_secret)))
         to_post = {
             "resource_id": params["resource_id"],
             "resource_type": params["resource_type"],
