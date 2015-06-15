@@ -65,7 +65,7 @@ class ClientTestCase(unittest.TestCase):
             with self.assertRaises(ClientError) as ex:
                 self.client.api_get("/somepath")
             # Because dicts don't guarantee a key order
-            messages = map(lambda z: z.strip(), ex.exception.message[31:].split(','))
+            messages = [s.strip() for s in ex.exception.message[31:].split(',')]
             messages.sort()
             self.assertEqual(messages, ['Oops', 'Server Error'])
 
@@ -78,7 +78,7 @@ class ClientTestCase(unittest.TestCase):
             with self.assertRaises(ClientError) as ex:
                 self.client.api_get("/somepath")
             # Because dicts don't guarantee a key order
-            messages = map(lambda z: z.strip(), ex.exception.message[31:].split(','))
+            messages = [s.strip() for s in ex.exception.message[31:].split(',')]
             messages.sort()
             self.assertEqual(messages, ['email invalid', 'email taken', 'name too short'])
 
