@@ -8,6 +8,7 @@ class ClientError(GoCardlessError):
         self.message = message
         if errors is not None:
             self.message += self._stringify_errors(errors)
+        super(ClientError, self).__init__(self.message)
 
     def _stringify_errors(self, errors):
         msgs = []
