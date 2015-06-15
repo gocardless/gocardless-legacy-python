@@ -64,8 +64,10 @@ class ClientTestCase(unittest.TestCase):
             mock_request_module.return_value = mock_request
             with self.assertRaises(ClientError) as ex:
                 self.client.api_get("/somepath")
-            self.assertEqual(ex.exception.message, "Error calling api, message"
-                " was Server Error, Oops")
+            # Because dicts don't guarantee a key order
+            messages = map(lambda z: z.strip(), ex.exception.message[31:].split(','))
+            messages.sort()
+            self.assertEqual(messages, ['Oops', 'Server Error'])
 
     def test_errors_raises_clienterror(self):
         with patch('gocardless.clientlib.Request') as mock_request_module:
@@ -75,8 +77,10 @@ class ClientTestCase(unittest.TestCase):
             mock_request_module.return_value = mock_request
             with self.assertRaises(ClientError) as ex:
                 self.client.api_get("/somepath")
-            self.assertEqual(ex.exception.message, "Error calling api, message"
-                " was name too short, email taken, email invalid")
+            # Because dicts don't guarantee a key order
+            messages = map(lambda z: z.strip(), ex.exception.message[31:].split(','))
+            messages.sort()
+            self.assertEqual(messages, ['email invalid', 'email taken', 'name too short'])
 
     def test_error_when_result_is_list(self):
         #Test for an issue where the code which checked if
