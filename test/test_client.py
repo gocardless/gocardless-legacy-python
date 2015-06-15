@@ -45,8 +45,9 @@ class ClientTestCase(unittest.TestCase):
         self.account_details = mock_account_details.copy()
         self.client = create_mock_client(self.account_details)
 
-    def test_error_raises_clienterror(self):
+    def test_error_raises_clienterror_string(self):
         with patch('gocardless.clientlib.Request') as mock_request_module:
+            #Test with response containing "error" as a string
             mock_request = mock.Mock()
             mock_request.perform.return_value = {"error":"anerrormessage"}
             mock_request_module.return_value = mock_request
@@ -54,6 +55,32 @@ class ClientTestCase(unittest.TestCase):
                 self.client.api_get("/somepath")
                 self.assertEqual(six.text_type(ex), "Error calling api, message"
                     " was anerrormessage")
+
+    def test_error_raises_clienterror_list(self):
+        with patch('gocardless.clientlib.Request') as mock_request_module:
+            #Test with response containing "error" as a list
+            mock_request = mock.Mock()
+            mock_request.perform.return_value = {"error":["Server Error", "Oops"]}
+            mock_request_module.return_value = mock_request
+            with self.assertRaises(ClientError) as ex:
+                self.client.api_get("/somepath")
+            # Because dicts don't guarantee a key order
+            messages = [s.strip() for s in ex.exception.message[31:].split(',')]
+            messages.sort()
+            self.assertEqual(messages, ['Oops', 'Server Error'])
+
+    def test_errors_raises_clienterror(self):
+        with patch('gocardless.clientlib.Request') as mock_request_module:
+            #Test with response containing "errors" with a dict
+            mock_request = mock.Mock()
+            mock_request.perform.return_value = {"errors":{"name":["too short"], "email":["taken","invalid"]}}
+            mock_request_module.return_value = mock_request
+            with self.assertRaises(ClientError) as ex:
+                self.client.api_get("/somepath")
+            # Because dicts don't guarantee a key order
+            messages = [s.strip() for s in ex.exception.message[31:].split(',')]
+            messages.sort()
+            self.assertEqual(messages, ['email invalid', 'email taken', 'name too short'])
 
     def test_error_when_result_is_list(self):
         #Test for an issue where the code which checked if
