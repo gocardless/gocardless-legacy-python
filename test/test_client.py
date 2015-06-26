@@ -7,6 +7,7 @@ from mock import patch
 import os
 import sys
 import time
+import re
 
 import six
 from six.moves import urllib
@@ -293,6 +294,13 @@ class UrlBuilderTestCase(unittest.TestCase):
         url = self.urlbuilder.build_and_sign(params)
         urlparams = get_url_params(url)
         self.assertIsNotNone(urlparams["nonce"])
+
+    def test_url_contains_valid_generated_nonce(self):
+        params = self.make_mock_params({"somekey":"someval"})
+        url = self.urlbuilder.build_and_sign(params)
+        urlparams = get_url_params(url)
+        regex = r'^[0-9a-zA-Z+/]+=*$'
+        self.assertTrue(re.match(regex, urlparams["nonce"]) is not None)
 
     def test_url_nonce_is_random(self):
         params = self.make_mock_params({"somekey":"somval"})
