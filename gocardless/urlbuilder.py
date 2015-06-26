@@ -40,7 +40,7 @@ class UrlBuilder(object):
         param_dict["client_id"] = self.client._app_id
         iso_time = datetime.datetime.utcnow().isoformat()
         param_dict["timestamp"] = iso_time[:-7] + "Z"
-        param_dict["nonce"] = base64.b64encode(os.urandom(40))
+        param_dict["nonce"] = base64.b64encode(os.urandom(40)).decode()
 
         signature = utils.generate_signature(param_dict, self.client._app_secret)
         param_dict["signature"] = signature
